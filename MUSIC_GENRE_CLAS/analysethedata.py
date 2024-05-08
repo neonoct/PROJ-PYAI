@@ -63,19 +63,61 @@ data = data.dropna()
 #         print(f"  Genre: {genre}")
 #     print("\n")  # Adds a space between different songs
 
-# Group by the song name and artist name, and aggregate genres into a list
-grouped = data.groupby(['track_name', 'artist_name'])['music_genre'].agg(list).reset_index()
-# Filter songs that have more than one genre
-multiple_genres = grouped[grouped['music_genre'].apply(lambda x: len(set(x)) > 1)]
-count = 0
-for index, row in multiple_genres.iterrows():
-    print(f"Song: {row['track_name']}, Artist: {row['artist_name']}")
-    count += 1
-    for genre in set(row['music_genre']):  # Using set to avoid duplicate genres
-        print(f"  Genre: {genre}")
-    print("\n")  # Adds a space between different songs
+# # Group by the song name and artist name, and aggregate genres into a list
+# grouped = data.groupby(['track_name', 'artist_name'])['music_genre'].agg(list).reset_index()
+# # Filter songs that have more than one genre
+# multiple_genres = grouped[grouped['music_genre'].apply(lambda x: len(set(x)) > 1)]
+# count = 0
+# for index, row in multiple_genres.iterrows():
+#     print(f"Song: {row['track_name']}, Artist: {row['artist_name']}")
+#     count += 1
+#     for genre in set(row['music_genre']):  # Using set to avoid duplicate genres
+#         print(f"  Genre: {genre}")
+#     print("\n")  # Adds a space between different songs
 
-print(f"Total songs with multiple genres: {count}")
+# print(f"Total songs with multiple genres: {count}")
+
+
+
+# # Group by the song name and artist name, and aggregate genres into a list
+# grouped = data.groupby(['track_name', 'artist_name'])['music_genre'].agg(list).reset_index()
+
+# # Updated function to handle case insensitivity
+# def contains_hip_hop_and_rap(genres):
+#     genre_set = set(genre.lower() for genre in genres)  # Case insensitive check
+#     return 'hip-hop' in genre_set and 'rap' in genre_set
+
+# # Filter songs that contain both 'hip-hop' and 'rap'
+# hip_hop_rap_songs = grouped[grouped['music_genre'].apply(contains_hip_hop_and_rap)]
+
+# count = 0
+# for index, row in hip_hop_rap_songs.iterrows():
+#     print(f"Song: {row['track_name']}, Artist: {row['artist_name']}")
+#     count += 1
+#     for genre in set(row['music_genre']):  # Using set to avoid duplicate genres
+#         print(f"  Genre: {genre}")
+#     print("\n")  # Adds a space between different songs
+
+# print(f"Total songs with both hip-hop and rap genres: {count}")
+
+
+
+# Sample loading of data, replace with your actual data loading
+# data = pd.read_csv('/path/to/music_genre.csv')
+
+# Assuming you've already created a grouped DataFrame like before:
+grouped = data.groupby(['track_name', 'artist_name'])['music_genre'].agg(list).reset_index()
+
+# Explode the genre list to multiple rows, one for each genre per song
+expanded_genres = grouped.explode('music_genre')
+
+# Count each genre
+genre_counts = expanded_genres['music_genre'].value_counts()
+
+# Print the counts
+print(genre_counts)
+
+
 
 
 
