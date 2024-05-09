@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import PolynomialFeatures
+
 
 # Load the dataset
 df = pd.read_csv('./MUSIC_GENRE_CLAS/music_genre.csv')
@@ -92,6 +94,7 @@ fill_missing_tempo(df)
 #Creating new features from existing ones
 
 #interaction features
+
 df['energy_danceability'] = df['energy'] * df['danceability']#no need to scale as the features are already on the same scale 0-1 -this category mostly useful for detecting genres like electronic
 
 scaler = StandardScaler()
@@ -99,7 +102,41 @@ scaler = StandardScaler()
 df['loudness_scaled'] = scaler.fit_transform(df[['loudness']])
 df['loudness_energy'] = df['loudness_scaled'] * df['energy']
 
+#aggregate features
+
+df['acoustic_instrumental_ratio'] = df['acousticness'] / (df['instrumentalness'] + 0.001)#adding a small value to the denominator to avoid division by zero
+
+#Categorical Binning of Continuous Variables
+bins = [0, 60, 90, 120, 150, 180, float('inf')]
+labels = ['very_slow', 'slow', 'moderate', 'fast', 'very_fast', 'extremely_fast']
+df['tempo_category'] = pd.cut(df['tempo'], bins=bins, labels=labels)
+
+df['duration_cat'] = pd.cut(df['duration_ms'], bins=[0, 180000, 240000, float('inf')], labels=['short', 'medium', 'long'])
+
+#polynomial features
+
+# Initialize the PolynomialFeatures object with degree 2 (for quadratic interactions)
+poly = PolynomialFeatures(degree=2, include_bias=False)
+
+# Select features to transform
+features = df[['tempo', 'energy', 'danceability', 'loudness', 'acousticness']]
+
+# It's a good practice to scale features before applying polynomial transformations
+scaler = StandardScaler()
+features_scaled = scaler.fit_transform(features)
+
+# Generate polynomial features
+features_poly = poly.fit_transform(features_scaled)
+poly_feature_names = poly.get_feature_names_out(['tempo', 'energy', 'danceability', 'loudness', 'acousticness'])
+
+# Create a DataFrame with the new polynomial features
+df_poly = pd.DataFrame(features_poly, columns=poly_feature_names)
+
+# Merge the new polynomial features back into the original DataFrame
+df = pd.concat([df, df_poly], axis=1)
+
 explore_dataset(df)
+
 
 
 

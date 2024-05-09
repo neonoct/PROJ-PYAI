@@ -78,9 +78,14 @@ which could lead to more accurate and meaningful analysis, especially when the t
 
 #####Feature Engineering######
 
-2 new featureas are created 
+2 new featureas are created - interaction features
 Importance of These Features:
 Energy and Danceability: The product of these features can help machine learning models recognize patterns where both attributes are important for classifying certain music genres.
 Loudness and Energy: This interaction can identify genres where loudness coupled with high energy defines the music style, such as in hard rock, where loud, energetic music is a hallmark.
+
+1 new feature - aggregate feature-
+acoustic_instrumental_ratio
+High Values: A high ratio indicates that a track is significantly more acoustic than instrumental. This might be characteristic of genres like folk or acoustic blues.
+Low Values: Conversely, a low ratio (closer to zero) would suggest that a track is more instrumental, which might be common in genres like electronic or classical music.
 
 
