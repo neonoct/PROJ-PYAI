@@ -11,6 +11,8 @@ To undertake your project on classifying music genres using the provided dataset
 - **Data Cleaning**: Handle missing values by either imputing or dropping them (as per your guidelines to manipulate the dataset). Convert data types if necessary.
 - **Feature Engineering**: Extract or create new features that could be relevant for genre classification. Consider transformations like scaling, polynomial features, or interaction terms.
   
+
+
 ### Step 3: Exploratory Data Analysis (EDA)
 - **Visualizations**: Use seaborn or matplotlib to create plots to visualize distributions of features, relationships between features, and the target variable.
 - **Correlation Analysis**: Analyze the correlation between numerical features and the target variable.
@@ -46,3 +48,16 @@ To undertake your project on classifying music genres using the provided dataset
 - **Submission**: Include code, datasets, models, and the project report.
 
 This roadmap is comprehensive and aligns with the requirements of your course project, emphasizing practical application of machine learning techniques and showcasing your ability to use a variety of tools and approaches.
+
+---NOTES ON THE STEPS---
+### Step 2 
+-Handling Float Columns: The presence of 11 float columns suggests that a significant portion of your data is numerical, which is typical for datasets involving measurements or quantitative data.
+ You'll need to check these columns for outliers, proper scaling, or normalization as needed for your analysis or model training.
+
+ Handling Object Columns: The object columns will likely require closer inspection to determine if they need cleaning or transformation. For example, if they contain categorical data,
+  you may need to convert them into a more suitable format for modeling, such as using one-hot encoding or label encoding. If they contain text, you might need to apply text preprocessing techniques.
+
+  Next Steps:
+Inspect Object Columns: Determine exactly what type of data is stored in each object column and decide on the appropriate preprocessing steps (e.g., converting text to numeric categories, parsing dates, handling mixed types).
+Numerical Data Analysis: For the float columns, you might consider plotting histograms or boxplots to visualize distributions and identify any outliers or anomalies.
+Memory Optimization: If necessary, consider strategies to reduce memory usage, such as converting data types to more memory-efficient formats (float32, int8, etc.), using categorical types for repetitive string data, or processing data in chunks.

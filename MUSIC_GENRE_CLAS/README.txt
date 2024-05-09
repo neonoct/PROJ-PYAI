@@ -7,6 +7,18 @@ The full list of genres included in the CSV are 'Electronic', 'Anime', 'Jazz', '
 
 https://www.kaggle.com/datasets/vicsuperman/prediction-of-music-genre
 
+instance_id: Likely an identifier for each record in the dataset.
+popularity: Numeric value representing the popularity of a track.
+acousticness: Measure of how acoustic a track is.
+danceability: Measure of how suitable a track is for dancing based on a combination of musical elements.
+duration_ms: Duration of the track in milliseconds.
+energy: Measure of intensity and activity.
+instrumentalness: Indicates the likelihood that a track contains no vocals.
+liveness: Detects the presence of an audience in the recording.
+loudness: The overall loudness of a track in decibels (dB).
+speechiness: Measures the presence of spoken words in a track.
+valence: Measure of the musical positiveness conveyed by a track.
+
 1-some songs are in two separate rows for being in two different genres(e.g-Blockhead-Cheer up, You're Not Dead Yet" is both in electronic and jazz)-total 7k
  (also their popularity are different in each instance as well as their genres)
 Total songs with multiple genres: 3633
@@ -16,9 +28,20 @@ Total songs with multiple genres: 3633
 4-all the song names are valid but some of them are in different Fonts 
 5-some of the acousticness is in scientific notation(e.g 4.18e-05) but there is no problem for them they are directly read 
 6-no problem seen with danceability
-7-some duration_ms is -1 meaning empty cell--5k
-8-some instrumentalness values are 0(missing data)-15K
-9-some tempo values are missing ? -5K
+7-some duration_ms is -1 meaning empty cell--5k columns
+8-some instrumentalness values are 0(missing data)-15K columns( are they missing or their instrumentalness is just 0 ?)
+9-some tempo values are missing ? -5K they are also categorized under object(string) because a part of the data is with '?' normally it should be numerical data(float64)
 10-from every label(genre) 5k instances
-11-obtained date can be dropped it is probably about on which date the data about that instance is gathered
-12-valence means how likely is the song to be positive higher the value positiver the song
+11-obtained date can be dropped it is probably about on which date the data about that instance is gathered into the dataset
+12-valence means how likely is the song to be positive higher the value positiver the song-2 songs have 0 valence
+
+--analyzing duration_ms{Distribution Characteristics:
+Central Peak: Most of the track durations are clustered around a central peak, which appears to be around 200,000 to 300,000 milliseconds (200 to 300 seconds). This range likely represents typical song lengths.
+Long Tail: There is a long tail extending to the right, up to about 800,000 milliseconds (800 seconds), indicating that there are some tracks significantly longer than the average.
+No Negative Values: The updated histogram scale starts from 0 and shows no negative values, providing a more realistic view of the data.
+Skewness:
+Value of 7.48: The high skewness value (greater than 1) confirms the visual assessment of the distribution being right-skewed. It indicates that the mean of the distribution is greater than the median due to the influence of these very long-duration tracks.
+Implications for Data Cleaning:
+Given this distribution, here's how to handle the duration_ms field:
+
+Replace Invalid Values: Since you noted that some duration_ms values are -1, indicating missing or incorrect entries, replacing these with the median duration is the most appropriate approach. The median is robust against the influence of the long tail (outliers).}

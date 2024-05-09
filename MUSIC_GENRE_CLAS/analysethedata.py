@@ -102,21 +102,26 @@ data = data.dropna()
 
 
 
-# Sample loading of data, replace with your actual data loading
-# data = pd.read_csv('/path/to/music_genre.csv')
+# # Sample loading of data, replace with your actual data loading
+# # data = pd.read_csv('/path/to/music_genre.csv')
 
-# Assuming you've already created a grouped DataFrame like before:
-grouped = data.groupby(['track_name', 'artist_name'])['music_genre'].agg(list).reset_index()
+# # Assuming you've already created a grouped DataFrame like before:
+# grouped = data.groupby(['track_name', 'artist_name'])['music_genre'].agg(list).reset_index()
 
-# Explode the genre list to multiple rows, one for each genre per song
-expanded_genres = grouped.explode('music_genre')
+# # Explode the genre list to multiple rows, one for each genre per song
+# expanded_genres = grouped.explode('music_genre')
 
-# Count each genre
-genre_counts = expanded_genres['music_genre'].value_counts()
+# # Count each genre
+# genre_counts = expanded_genres['music_genre'].value_counts()
 
-# Print the counts
-print(genre_counts)
+# # Print the counts
+# print(genre_counts)
 
+# #print the rows where valence is 0
+# print(data[data['valence'] == 0]) 
+
+#print where liveness is 1
+#print(data[data['liveness'] == 1])
 
 
 
