@@ -72,4 +72,15 @@ This distribution supports a genre-specific imputation strategy for missing valu
 For general analysis, imputing missing tempo values using the median or mode of the entire dataset might obscure these nuanced differences between musical styles.
 
 using the genre-specific mode 
-This approach allows for more nuanced imputation where missing tempo values are filled in a way that respects the typical tempo characteristics of each genre, which could lead to more accurate and meaningful analysis, especially when the tempo could significantly vary between genres.
+This approach allows for more nuanced imputation where missing tempo values are filled in a way that respects the typical tempo characteristics of each genre, 
+which could lead to more accurate and meaningful analysis, especially when the tempo could significantly vary between genres.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+#####Feature Engineering######
+
+2 new featureas are created 
+Importance of These Features:
+Energy and Danceability: The product of these features can help machine learning models recognize patterns where both attributes are important for classifying certain music genres.
+Loudness and Energy: This interaction can identify genres where loudness coupled with high energy defines the music style, such as in hard rock, where loud, energetic music is a hallmark.
+
+

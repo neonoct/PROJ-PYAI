@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+from sklearn.preprocessing import StandardScaler
 
 # Load the dataset
 df = pd.read_csv('./MUSIC_GENRE_CLAS/music_genre.csv')
@@ -87,9 +88,18 @@ def fill_missing_tempo(df):
 
 fill_missing_tempo(df)
 
-#save the cleaned dataset
-df.to_csv('./MUSIC_GENRE_CLAS/music_genre_cleaned.csv', index=False)
+#########################################
+#Creating new features from existing ones
 
+#interaction features
+df['energy_danceability'] = df['energy'] * df['danceability']#no need to scale as the features are already on the same scale 0-1 -this category mostly useful for detecting genres like electronic
+
+scaler = StandardScaler()
+# Assuming 'loudness' needs to be scaled for interaction with 'energy'
+df['loudness_scaled'] = scaler.fit_transform(df[['loudness']])
+df['loudness_energy'] = df['loudness_scaled'] * df['energy']
+
+explore_dataset(df)
 
 
 
