@@ -129,13 +129,27 @@ features_scaled = scaler.fit_transform(features)
 features_poly = poly.fit_transform(features_scaled)
 poly_feature_names = poly.get_feature_names_out(['tempo', 'energy', 'danceability', 'loudness', 'acousticness'])
 
+
 # Create a DataFrame with the new polynomial features
 df_poly = pd.DataFrame(features_poly, columns=poly_feature_names)
+# Check how many rows have all values as NaN
+missing_data_count = df.isnull().all(axis=1).sum()
+print(f"Total rows completely missing: {missing_data_count}")
+
+# Detailed missing data count for each column
+print(df.isnull().sum())
+
+# Reset indices if they do not match
+df.reset_index(drop=True, inplace=True)
+df_poly.reset_index(drop=True, inplace=True)
+
 
 # Merge the new polynomial features back into the original DataFrame
 df = pd.concat([df, df_poly], axis=1)
 
-explore_dataset(df)
+
+
+
 
 
 
