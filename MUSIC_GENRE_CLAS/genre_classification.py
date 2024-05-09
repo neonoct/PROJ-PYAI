@@ -87,7 +87,8 @@ def fill_missing_tempo(df):
 
 fill_missing_tempo(df)
 
-
+#save the cleaned dataset
+df.to_csv('./MUSIC_GENRE_CLAS/music_genre_cleaned.csv', index=False)
 
 
 

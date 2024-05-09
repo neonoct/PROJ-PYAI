@@ -65,3 +65,11 @@ With tempo values missing in 5k rows and marked with '?', making the column type
 
 Replace '?' with a numerical placeholder (like NaN) and then convert the column to float.
 Impute missing values with a statistical measure (mean or median).
+
+Data Distribution and Imputation Strategy:
+The distribution is multimodal, with several key peaks which confirm the presence of groups of songs with similar tempos, often characteristic of specific musical genres or styles.
+This distribution supports a genre-specific imputation strategy for missing values, as different genres might have different typical tempos.
+For general analysis, imputing missing tempo values using the median or mode of the entire dataset might obscure these nuanced differences between musical styles.
+
+using the genre-specific mode 
+This approach allows for more nuanced imputation where missing tempo values are filled in a way that respects the typical tempo characteristics of each genre, which could lead to more accurate and meaningful analysis, especially when the tempo could significantly vary between genres.
