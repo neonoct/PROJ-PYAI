@@ -35,7 +35,9 @@ Total songs with multiple genres: 3633
 11-obtained date can be dropped it is probably about on which date the data about that instance is gathered into the dataset
 12-valence means how likely is the song to be positive higher the value positiver the song-2 songs have 0 valence
 
---analyzing duration_ms{Distribution Characteristics:
+--changing artist_name s that are empty_field to Unknown artist
+
+---analyzing duration_ms{Distribution Characteristics:
 Central Peak: Most of the track durations are clustered around a central peak, which appears to be around 200,000 to 300,000 milliseconds (200 to 300 seconds). This range likely represents typical song lengths.
 Long Tail: There is a long tail extending to the right, up to about 800,000 milliseconds (800 seconds), indicating that there are some tracks significantly longer than the average.
 No Negative Values: The updated histogram scale starts from 0 and shows no negative values, providing a more realistic view of the data.
@@ -45,3 +47,21 @@ Implications for Data Cleaning:
 Given this distribution, here's how to handle the duration_ms field:
 
 Replace Invalid Values: Since you noted that some duration_ms values are -1, indicating missing or incorrect entries, replacing these with the median duration is the most appropriate approach. The median is robust against the influence of the long tail (outliers).}
+and i made sure that these were likely to be valid.
+---analyzing instrumentalness
+to make sure if this analyze was on point and ensures that 0s are valid values in the instrumentalness i asked chatgpt better analyze the effect of output distribution of other features where instrumentalness is 0
+{. Instrumentalness Comparison:
+The tracks with instrumentalness of 0 form a large subset of the overall data (30% of the entries if we consider 15,001 out of 50,000). This significant proportion suggests that a zero value is common and likely represents tracks with no instrumental content rather than missing data.
+2. Other Feature Distributions:
+Popularity: The mean popularity of tracks with zero instrumentalness (50.72) is notably higher than the overall average (44.22). This could indicate that non-instrumental tracks tend to be more popular.
+Acousticness: These tracks have lower average acousticness (0.213) compared to the overall average (0.306), which aligns with them being less instrumental.
+Danceability and Energy: Tracks with zero instrumentalness are more danceable (mean 0.621 vs. 0.558) and have higher energy (mean 0.668 vs. 0.600) than the average, supporting the idea that these tracks are likely more vocal and rhythm-focused.
+3. Loudness and Speechiness:
+Loudness: Tracks with zero instrumentalness are louder on average (-6.61 dB compared to -9.13 dB overall), which is typical for more commercial, vocal-heavy music.
+Speechiness: There's also a higher degree of speechiness (0.135 vs. 0.094) in these tracks, which could be associated with genres that feature more spoken words, like hip-hop or rap.}
+
+---analyzing missing tempo values
+With tempo values missing in 5k rows and marked with '?', making the column type as object:
+
+Replace '?' with a numerical placeholder (like NaN) and then convert the column to float.
+Impute missing values with a statistical measure (mean or median).

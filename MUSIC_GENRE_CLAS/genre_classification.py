@@ -1,12 +1,14 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 
 # Load the dataset
 df = pd.read_csv('./MUSIC_GENRE_CLAS/music_genre.csv')
 
+
 def explore_dataset(df):
     # Display the first few rows of the DataFrame
-    print(df.head())
+    #print(df.head())
 
     # Display info about data types and number of non-null values
     print(df.info()) # some of the tempo values seem to be strings it is because missing values in this column are represented as '?' in the dataset
@@ -20,6 +22,7 @@ def explore_dataset(df):
 
     # Check for missing values
     print(df.isnull().sum()) # 5 rows are missing
+
 
 # Drop rows with missing values(where the whole row is missing)
 df = df.dropna()
@@ -50,6 +53,43 @@ df['duration_ms'] = df['duration_ms'].replace(-1, median_duration)
 # Optional: Cap durations at the 95th percentile to limit the impact of extreme outliers
 #percentile_95 = df['duration_ms'].quantile(0.95)
 #df['duration_ms'] = df['duration_ms'].clip(upper=percentile_95)
+
+def analyze_instrumentalness(df):#understood that 0s are valid values in the instrumentalness column
+    # Check the distribution of other features where instrumentalness is 0
+    print(df[df['instrumentalness'] == 0].describe())
+
+    # Display summary statistics for numeric columns-for comparison
+    print(df.describe())
+
+
+# Replace '?' with NaN and convert the column to float in the tempo column
+df['tempo'] = pd.to_numeric(df['tempo'].replace('?', np.nan), errors='coerce')#after converting the tempo column to float, we can now calculate the mean tempo and replace the missing values with it
+
+def analyze_tempo(df):
+    df[df['tempo'] > 0]['tempo'].hist(bins=100)
+    plt.title('Distribution of tempo')
+    plt.xlabel('Tempo')
+    plt.ylabel('Frequency')
+    plt.show()
+
+    # Calculate skewness
+    skewness = df[df['tempo'] > 0]['tempo'].skew()
+    print(f"Skewness of tempo: {skewness}")
+
+
+
+def fill_missing_tempo(df):
+    #this aproach allows for more nuanced imputation of missing tempo values based on the music genre respects the typical characteristics of each genre
+    if 'music_genre' in df.columns:
+        for genre in df['music_genre'].unique():
+            genre_mode = df[df['music_genre'] == genre]['tempo'].mode()[0]
+            df.loc[(df['tempo'].isnull()) & (df['music_genre'] == genre), 'tempo'] = genre_mode
+
+fill_missing_tempo(df)
+
+
+
+
 
 
 
