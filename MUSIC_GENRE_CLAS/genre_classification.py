@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import PolynomialFeatures
 
@@ -169,32 +170,102 @@ def generate_polynomial_features(df):
 
 df = generate_polynomial_features(df)
 
-#added polynomial features to the dataset i do not know if it they are useful or not but i will keep them for now
+#added polynomial features to the dataset i do not know if  they are useful or not but i will keep them for now
 
-explore_dataset(df)
+#########################################
+#EDA- exploratory data analysis 
 
-# Check how many rows have all values as NaN
-missing_data_count = df.isnull().all(axis=1).sum()
-print(f"Total rows completely missing: {missing_data_count}")
+def plot_feature_distribution(df, feature):
+    # Plot the distribution of a feature
+    df[feature].hist(bins=100)
+    plt.title(f'Distribution of {feature}')
+    plt.xlabel(feature)
+    plt.ylabel('Frequency')
+    plt.show()
 
-# Detailed missing data count for each column
-print(df.isnull().sum())
+def plot_feature_boxplot(df, feature):
+    # Plot a boxplot of a feature
+    sns.boxplot(data=df, x=feature)
+    plt.title(f'Boxplot of {feature}')
+    plt.xlabel(feature)
+    plt.show()
+
+def plot_feature_by_genre(df, feature):
+    # Plot the distribution of a feature by genre(target variable)
+    plt.figure(figsize=(12, 6))
+    sns.violinplot(data=df, x='music_genre', y=feature)
+    plt.title(f'{feature} by Genre')
+    plt.xlabel('Genre')
+    plt.ylabel(feature)
+    plt.xticks(rotation=45)
+    plt.show()
+
+# Histograms for continuous features
+def plot_histograms(df):
+    for col in df.select_dtypes(include=['float64']).columns:
+        plot_feature_distribution(df, col)
+
+# Boxplots for visualizing outliers
+def plot_boxplots(df):
+    for col in df.select_dtypes(include=['float64']).columns:
+        plt.figure(figsize=(10, 4))
+        sns.boxplot(x=df[col])
+        plt.title(f'Boxplot of {col}')
+        plt.xlabel(col)
+        plt.show()
+
+# Histograms for continuous features--via cptt
+def plot_histograms(df):
+    for col in df.select_dtypes(include=['float64']).columns:   
+        plt.figure(figsize=(10, 4))
+        sns.histplot(df[col], kde=True)
+        plt.title(f'Distribution of {col}')
+        plt.xlabel(col)
+        plt.ylabel('Frequency')
+        plt.show()
+
+# Boxplots for visualizing outliers--via cptt
+def plot_boxplots(df):
+    for col in df.select_dtypes(include=['float64']).columns:
+        plt.figure(figsize=(10, 4))
+        sns.boxplot(x=df[col])
+        plt.title(f'Boxplot of {col}')
+        plt.xlabel(col)
+        plt.show()  
+
+# Scatter plots for continuous features vs. music genre--via cptt
+def plot_scatterplots(df):
+    for col in df.select_dtypes(include=['float64']).columns:
+        plt.figure(figsize=(10, 6))
+        sns.scatterplot(x=df[col], y=df['music_genre'])
+        plt.title(f'Scatter plot of {col} vs. Music Genre')
+        plt.xlabel(col)
+        plt.ylabel('Music Genre')
+        plt.show()
+
+# Pairplot for selected features--via cptt
+def plot_pairplot(df):
+    features = ['tempo', 'energy', 'danceability', 'loudness', 'acousticness', 'music_genre']
+    sns.pairplot(df[features], hue='music_genre', diag_kind='hist')
+    #sns.pairplot(df[features], hue='music_genre', corner=True) # corner=True from cptt
+    plt.show()
 
 
+def visualize_correlation(df):
+    # Correlation matrix
+    correlation_matrix = df.corr()
 
+    # Heatmap to visualize the correlation matrix
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm')
+    plt.title('Correlation Matrix of Features')
+    plt.show()
 
-
-
-
-
-
-
-
-
-
-
-
-
+    # Specific correlation with target, if target is numerically encoded; otherwise, consider ANOVA or similar tests
+    # Assuming 'music_genre' is numerically encoded for this purpose
+    if 'music_genre' in correlation_matrix:
+        genre_corr = correlation_matrix['music_genre'].sort_values(ascending=False)
+        print(genre_corr)
 
 
 

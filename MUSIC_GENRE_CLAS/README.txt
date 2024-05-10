@@ -1,5 +1,14 @@
 BISMILLAHIRRAHMANIRRAHIM
 __________________________
+explore_dataset(df)
+
+# Check how many rows have all values as NaN
+missing_data_count = df.isnull().all(axis=1).sum()
+print(f"Total rows completely missing: {missing_data_count}")
+
+# Detailed missing data count for each column
+print(df.isnull().sum())
+
 Prediction of music genre
 Classify music into genres
 
