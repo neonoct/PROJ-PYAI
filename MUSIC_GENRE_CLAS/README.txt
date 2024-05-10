@@ -88,4 +88,13 @@ acoustic_instrumental_ratio
 High Values: A high ratio indicates that a track is significantly more acoustic than instrumental. This might be characteristic of genres like folk or acoustic blues.
 Low Values: Conversely, a low ratio (closer to zero) would suggest that a track is more instrumental, which might be common in genres like electronic or classical music.
 
+2 categories from the existing ones- tempo_category and duration category
+--
+
+---Added polynomial 
+added polynomial features to the dataset i do not know if it they are useful or not but i will keep them for now, i do not actually know what they do and their purposes might delete them all but 
+first they need analysis,i will decide later whether to keep them or delete them and just use the other newly created features or the original ones.
+
+
+####### Step 3: Exploratory Data Analysis (EDA)
 

@@ -169,6 +169,8 @@ def generate_polynomial_features(df):
 
 df = generate_polynomial_features(df)
 
+#added polynomial features to the dataset i do not know if it they are useful or not but i will keep them for now
+
 explore_dataset(df)
 
 # Check how many rows have all values as NaN
