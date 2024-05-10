@@ -30,8 +30,11 @@ def explore_dataset(df):
 # Drop rows with missing values(where the whole row is missing)
 df = df.dropna()
 
-# Replace 'empty_field' with 'Unknown Artist'
-df['artist_name'] = df['artist_name'].replace('empty_field', 'Unknown Artist') # for this project i will assume that artist_name is not important and i will not use(probably) it in the model
+def replace_empty_artist_name(df):
+    df['artist_name'] = df['artist_name'].replace('empty_field', 'Unknown Artist')
+    return df
+
+replace_empty_artist_name(df)
 
 def analyze_duration(df):
     # Decide whether to use median or mean to replace -1 values in duration_ms
@@ -47,15 +50,19 @@ def analyze_duration(df):
     skewness = df[df['duration_ms'] > 0]['duration_ms'].skew()
     print(f"Skewness of duration_ms: {skewness}")
     
-#we are going to use the median to replace the -1 values in the duration_ms column instead of the mean because the data is right-skewed
-# Calculate the median duration from valid entries
-median_duration = df[df['duration_ms'] > 0]['duration_ms'].median()
+def replace_negative_duration(df):
+    # Calculate the median duration from valid entries
+    median_duration = df[df['duration_ms'] > 0]['duration_ms'].median()
 
-# Replace -1 values with the median duration
-df['duration_ms'] = df['duration_ms'].replace(-1, median_duration)
-# Optional: Cap durations at the 95th percentile to limit the impact of extreme outliers
-#percentile_95 = df['duration_ms'].quantile(0.95)
-#df['duration_ms'] = df['duration_ms'].clip(upper=percentile_95)
+    # Replace -1 values with the median duration
+    df['duration_ms'] = df['duration_ms'].replace(-1, median_duration)
+    # Optional: Cap durations at the 95th percentile to limit the impact of extreme outliers
+    #percentile_95 = df['duration_ms'].quantile(0.95)
+    #df['duration_ms'] = df['duration_ms'].clip(upper=percentile_95)
+    
+    return df
+
+df = replace_negative_duration(df)
 
 def analyze_instrumentalness(df):#understood that 0s are valid values in the instrumentalness column
     # Check the distribution of other features where instrumentalness is 0
@@ -65,8 +72,13 @@ def analyze_instrumentalness(df):#understood that 0s are valid values in the ins
     print(df.describe())
 
 
-# Replace '?' with NaN and convert the column to float in the tempo column
-df['tempo'] = pd.to_numeric(df['tempo'].replace('?', np.nan), errors='coerce')#after converting the tempo column to float, we can now calculate the mean tempo and replace the missing values with it
+def replace_missing_tempo(df):
+    df['tempo'] = pd.to_numeric(df['tempo'].replace('?', np.nan), errors='coerce')
+    mean_tempo = df['tempo'].mean()
+    df['tempo'] = df['tempo'].fillna(mean_tempo)
+    return df
+
+replace_missing_tempo(df)
 
 def analyze_tempo(df):
     df[df['tempo'] > 0]['tempo'].hist(bins=100)
@@ -95,59 +107,76 @@ fill_missing_tempo(df)
 
 #interaction features
 
-df['energy_danceability'] = df['energy'] * df['danceability']#no need to scale as the features are already on the same scale 0-1 -this category mostly useful for detecting genres like electronic
+def create_interaction_features(df):
+    df['energy_danceability'] = df['energy'] * df['danceability']
+    
+    scaler = StandardScaler()
+    df['loudness_scaled'] = scaler.fit_transform(df[['loudness']])
+    df['loudness_energy'] = df['loudness_scaled'] * df['energy']
+    
+    return df
 
-scaler = StandardScaler()
-# Assuming 'loudness' needs to be scaled for interaction with 'energy'
-df['loudness_scaled'] = scaler.fit_transform(df[['loudness']])
-df['loudness_energy'] = df['loudness_scaled'] * df['energy']
+df = create_interaction_features(df)
 
 #aggregate features
 
-df['acoustic_instrumental_ratio'] = df['acousticness'] / (df['instrumentalness'] + 0.001)#adding a small value to the denominator to avoid division by zero
+def create_acoustic_instrumental_ratio(df):
+    df['acoustic_instrumental_ratio'] = df['acousticness'] / (df['instrumentalness'] + 0.001)
+    return df
+
+create_acoustic_instrumental_ratio(df)
 
 #Categorical Binning of Continuous Variables
-bins = [0, 60, 90, 120, 150, 180, float('inf')]
-labels = ['very_slow', 'slow', 'moderate', 'fast', 'very_fast', 'extremely_fast']
-df['tempo_category'] = pd.cut(df['tempo'], bins=bins, labels=labels)
 
-df['duration_cat'] = pd.cut(df['duration_ms'], bins=[0, 180000, 240000, float('inf')], labels=['short', 'medium', 'long'])
+def create_categorical_features(df):
+    bins = [0, 60, 90, 120, 150, 180, float('inf')]
+    labels = ['very_slow', 'slow', 'moderate', 'fast', 'very_fast', 'extremely_fast']
+    df['tempo_category'] = pd.cut(df['tempo'], bins=bins, labels=labels)
+
+    df['duration_cat'] = pd.cut(df['duration_ms'], bins=[0, 180000, 240000, float('inf')], labels=['short', 'medium', 'long'])
+    
+    return df
+
+create_categorical_features(df)
 
 #polynomial features
 
-# Initialize the PolynomialFeatures object with degree 2 (for quadratic interactions)
-poly = PolynomialFeatures(degree=2, include_bias=False)
+def generate_polynomial_features(df):
+    # Initialize the PolynomialFeatures object with degree 2 (for quadratic interactions)
+    poly = PolynomialFeatures(degree=2, include_bias=False)
 
-# Select features to transform
-features = df[['tempo', 'energy', 'danceability', 'loudness', 'acousticness']]
+    # Select features to transform
+    features = df[['tempo', 'energy', 'danceability', 'loudness', 'acousticness']]
 
-# It's a good practice to scale features before applying polynomial transformations
-scaler = StandardScaler()
-features_scaled = scaler.fit_transform(features)
+    # It's a good practice to scale features before applying polynomial transformations
+    scaler = StandardScaler()
+    features_scaled = scaler.fit_transform(features)
 
-# Generate polynomial features
-features_poly = poly.fit_transform(features_scaled)
-poly_feature_names = poly.get_feature_names_out(['tempo', 'energy', 'danceability', 'loudness', 'acousticness'])
+    # Generate polynomial features
+    features_poly = poly.fit_transform(features_scaled)
+    poly_feature_names = poly.get_feature_names_out(['tempo', 'energy', 'danceability', 'loudness', 'acousticness'])
 
+    # Create a DataFrame with the new polynomial features
+    df_poly = pd.DataFrame(features_poly, columns=poly_feature_names)
+    # Reset indices if they do not match
+    df.reset_index(drop=True, inplace=True)
+    df_poly.reset_index(drop=True, inplace=True)
 
-# Create a DataFrame with the new polynomial features
-df_poly = pd.DataFrame(features_poly, columns=poly_feature_names)
+    # Merge the new polynomial features back into the original DataFrame
+    df = pd.concat([df, df_poly], axis=1)
+    
+    return df
+
+df = generate_polynomial_features(df)
+
+explore_dataset(df)
+
 # Check how many rows have all values as NaN
 missing_data_count = df.isnull().all(axis=1).sum()
 print(f"Total rows completely missing: {missing_data_count}")
 
 # Detailed missing data count for each column
 print(df.isnull().sum())
-
-# Reset indices if they do not match
-df.reset_index(drop=True, inplace=True)
-df_poly.reset_index(drop=True, inplace=True)
-
-
-# Merge the new polynomial features back into the original DataFrame
-df = pd.concat([df, df_poly], axis=1)
-
-
 
 
 
