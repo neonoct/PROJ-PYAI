@@ -299,11 +299,17 @@ def plot_pairplot(df):
     #sns.pairplot(df[features], hue='music_genre', corner=True) # corner=True from cptt
     plt.show()
 
-plot_pairplot(df)
+#plot_pairplot(df)
 
 def visualize_correlation(df):
+    import seaborn as sns
+    import matplotlib.pyplot as plt
+
+    # Select only numeric columns for correlation matrix
+    numeric_df = df.select_dtypes(include=[np.number])  # Ensure this imports numpy as np
+
     # Correlation matrix
-    correlation_matrix = df.corr()
+    correlation_matrix = numeric_df.corr()
 
     # Heatmap to visualize the correlation matrix
     plt.figure(figsize=(12, 10))
@@ -317,7 +323,7 @@ def visualize_correlation(df):
         genre_corr = correlation_matrix['music_genre'].sort_values(ascending=False)
         print(genre_corr)
 
-
+visualize_correlation(df)
 
 
 
