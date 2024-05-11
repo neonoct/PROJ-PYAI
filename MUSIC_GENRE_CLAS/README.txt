@@ -178,3 +178,12 @@ Dimensionality Reduction: For visualizing feature influence on genre categorizat
 #Step 4: Feature Selection and Dimensionality Reduction
 
 #Feature Selection
+Chi-square test for key_encoded:
+Chi2 statistic: 2420.652503437906, p-value: 0.0
+
+Chi-square test for mode_encoded:
+Chi2 statistic: 2339.851418315166, p-value: 0.0
+
+The results from your Chi-square tests indicate very strong statistical significance for both the key_encoded and mode_encoded features with respect to the music genre. Here’s what these results imply and the steps you can take moving forward:
+
+

@@ -5,6 +5,9 @@ import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+from scipy.stats import chi2_contingency
+
 
 
 # Load the dataset
@@ -303,8 +306,6 @@ def plot_pairplot(df):
 #plot_pairplot(df)
 
 def visualize_correlation(df):
-    import seaborn as sns
-    import matplotlib.pyplot as plt
 
     # Select only numeric columns for correlation matrix
     numeric_df = df.select_dtypes(include=[np.number])  # Ensure this imports numpy as np
@@ -372,10 +373,57 @@ def visualize_correlation_genre(df):
     plt.show()
 
 # Apply the function to your DataFrame
-visualize_correlation_genre(df)
+#visualize_correlation_genre(df)
+
+#Feature Selection################################
+####################################################
 
 
+#Chi-Squared Test for Feature Selection -catgorical features
+def encode_categorical_features(df):
+    # Assuming 'key' and 'mode' are categorical features in your dataset
+    encoder = LabelEncoder()
+    df['key_encoded'] = encoder.fit_transform(df['key'])
+    df['mode_encoded'] = encoder.fit_transform(df['mode'])
+    df['music_genre_encoded'] = encoder.fit_transform(df['music_genre'])  # ensure it's encoded for this usage
+    return df
 
+# Create a contingency table and perform Chi-square test
+def perform_chi_square(feature):
+    encode_categorical_features(df)
+    contingency_table = pd.crosstab(df[feature], df['music_genre_encoded'])
+    chi2, p, dof, expected = chi2_contingency(contingency_table)
+    print(f"Chi-square test for {feature}:")
+    print(f"Chi2 statistic: {chi2}, p-value: {p}\n")
+
+# Apply the test to categorical features
+#perform_chi_square('key_encoded')
+#perform_chi_square('mode_encoded')
+
+def plot_key_frequency(df):
+    # Plotting the frequency of keys within each genre
+    plt.figure(figsize=(14, 8))
+    sns.countplot(x='key', hue='music_genre', data=df, palette='viridis')
+    plt.title('Distribution of Musical Keys Across Genres')
+    plt.xlabel('Musical Key')
+    plt.ylabel('Frequency')
+    plt.legend(title='Genre', bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.xticks(rotation=45)
+    plt.show()
+
+#plot_key_frequency(df)
+
+def plot_mode_frequency(df):
+    # Plotting the frequency of modes within each genre
+    plt.figure(figsize=(10, 6))
+    sns.countplot(x='mode', hue='music_genre', data=df, palette='viridis')
+    plt.title('Distribution of Mode Across Genres')
+    plt.xlabel('Mode')
+    plt.ylabel('Frequency')
+    plt.legend(title='Genre', bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.show()
+
+#plot_mode_frequency(df)
 
 
 
