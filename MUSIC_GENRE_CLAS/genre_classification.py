@@ -323,7 +323,33 @@ def visualize_correlation(df):
         genre_corr = correlation_matrix['music_genre'].sort_values(ascending=False)
         print(genre_corr)
 
-visualize_correlation(df)
+#visualize_correlation(df)
+
+def visualize_simplified_correlation(df):
+
+    # Select a meaningful subset of features
+    selected_features = [
+        'popularity', 'acousticness', 'danceability', 'energy', 
+        'loudness', 'speechiness', 'valence', 'tempo'
+    ]
+
+    # Ensure only these selected features are used
+    df_selected = df[selected_features]
+
+    # Calculate the correlation matrix for the selected features
+    correlation_matrix = df_selected.corr()
+
+    # Heatmap to visualize the correlation matrix
+    plt.figure(figsize=(10, 8))  # Adjust size as needed
+    sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm', center=0, vmin=-1, vmax=1)
+    plt.title('Simplified Correlation Matrix of Selected Features')
+    plt.show()
+
+# Apply the function to your DataFrame
+visualize_simplified_correlation(df)
+
+
+
 
 
 
