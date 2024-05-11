@@ -103,15 +103,17 @@ def fill_missing_tempo(df):
 
 fill_missing_tempo(df)
 
-#########################################
-#Creating new features from existing ones
+#Feature Engineering################################
+####################################################
+
+#Creating new features from existing ones##
 
 #interaction features
 
 def create_interaction_features(df):
     df['energy_danceability'] = df['energy'] * df['danceability']
     
-    scaler = StandardScaler()
+    scaler = StandardScaler()#standar scaler scales tjese features to have a mean of 0 and a standard deviation of 1
     df['loudness_scaled'] = scaler.fit_transform(df[['loudness']])
     df['loudness_energy'] = df['loudness_scaled'] * df['energy']
     
@@ -143,13 +145,14 @@ create_categorical_features(df)
 #polynomial features
 
 def generate_polynomial_features(df):
+
     # Initialize the PolynomialFeatures object with degree 2 (for quadratic interactions)
     poly = PolynomialFeatures(degree=2, include_bias=False)
 
     # Select features to transform
     features = df[['tempo', 'energy', 'danceability', 'loudness', 'acousticness']]
 
-    # It's a good practice to scale features before applying polynomial transformations
+    # Scale features before applying polynomial transformations
     scaler = StandardScaler()
     features_scaled = scaler.fit_transform(features)
 
@@ -159,16 +162,40 @@ def generate_polynomial_features(df):
 
     # Create a DataFrame with the new polynomial features
     df_poly = pd.DataFrame(features_poly, columns=poly_feature_names)
+
     # Reset indices if they do not match
     df.reset_index(drop=True, inplace=True)
     df_poly.reset_index(drop=True, inplace=True)
+
+    # Drop original feature columns from df_poly
+    original_features = ['tempo', 'energy', 'danceability', 'loudness', 'acousticness']
+    df_poly.drop(original_features, axis=1, inplace=True)
 
     # Merge the new polynomial features back into the original DataFrame
     df = pd.concat([df, df_poly], axis=1)
     
     return df
+    
+    
 
-df = generate_polynomial_features(df)
+#display the features before adding polynomial features (whether they are categorical or continuous)
+#print(df.dtypes)
+
+
+df = generate_polynomial_features(df)#total number of polynomial features generated is 21
+
+#or if it is the second time with the same column name
+new_column_names = []
+for col in df.columns:
+    #or if it is the second time with the same column name
+    if '^' in col or ' ' in col:  # Identify polynomial feature columns
+        
+
+        new_column_names.append(col + '_poly')  # Append a suffix to denote polynomial features
+    else:
+        new_column_names.append(col)
+
+df.columns = new_column_names
 
 #added polynomial features to the dataset i do not know if  they are useful or not but i will keep them for now
 
@@ -200,13 +227,20 @@ def plot_feature_by_genre(df, feature):
     plt.xticks(rotation=45)
     plt.show()
 
+
+
 # Histograms for continuous features
-def plot_histograms(df):
+def plot_histograms_1(df):
     for col in df.select_dtypes(include=['float64']).columns:
         plot_feature_distribution(df, col)
+        #plot_feature_boxplot(df, col)
+        #plot_feature_by_genre(df, col)
+        
+# plot_histograms(df)
+# print("done")
 
 # Boxplots for visualizing outliers
-def plot_boxplots(df):
+def plot_boxplots_1(df):
     for col in df.select_dtypes(include=['float64']).columns:
         plt.figure(figsize=(10, 4))
         sns.boxplot(x=df[col])
@@ -216,32 +250,47 @@ def plot_boxplots(df):
 
 # Histograms for continuous features--via cptt
 def plot_histograms(df):
-    for col in df.select_dtypes(include=['float64']).columns:   
+    for col in ['popularity', 'acousticness', 'danceability', 'energy', 'loudness']:   
         plt.figure(figsize=(10, 4))
-        sns.histplot(df[col], kde=True)
+        sns.histplot(df[col], kde=True)#kde=True adds a kernel density estimate to the plot
         plt.title(f'Distribution of {col}')
         plt.xlabel(col)
         plt.ylabel('Frequency')
         plt.show()
+#plot_histograms(df)
 
 # Boxplots for visualizing outliers--via cptt
 def plot_boxplots(df):
-    for col in df.select_dtypes(include=['float64']).columns:
-        plt.figure(figsize=(10, 4))
-        sns.boxplot(x=df[col])
-        plt.title(f'Boxplot of {col}')
-        plt.xlabel(col)
-        plt.show()  
+    for col in ['popularity', 'acousticness', 'danceability', 'energy', 'loudness']:
+        try:
+            plt.figure(figsize=(10, 4))
+            sns.boxplot(x=df[col])
+            plt.title(f'Boxplot of {col}')
+            plt.xlabel(col)
+            plt.show()
+        except Exception as e:
+            print(f"Error plotting {col}: {e}")
+
+
+#plot_boxplots(df)
+# Check the content of each column
+def check_content(df):
+    for col in df.columns:
+        print(f"Column: {col}")
+        print(df[col].value_counts())
+        print("\n")
+#check_content(df)
 
 # Scatter plots for continuous features vs. music genre--via cptt
 def plot_scatterplots(df):
-    for col in df.select_dtypes(include=['float64']).columns:
+    for col in ['tempo', 'energy', 'danceability', 'loudness', 'acousticness']:
         plt.figure(figsize=(10, 6))
         sns.scatterplot(x=df[col], y=df['music_genre'])
         plt.title(f'Scatter plot of {col} vs. Music Genre')
         plt.xlabel(col)
         plt.ylabel('Music Genre')
         plt.show()
+#plot_scatterplots(df)
 
 # Pairplot for selected features--via cptt
 def plot_pairplot(df):
@@ -250,6 +299,7 @@ def plot_pairplot(df):
     #sns.pairplot(df[features], hue='music_genre', corner=True) # corner=True from cptt
     plt.show()
 
+plot_pairplot(df)
 
 def visualize_correlation(df):
     # Correlation matrix
