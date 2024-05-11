@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import PolynomialFeatures
+from sklearn.preprocessing import LabelEncoder
 
 
 # Load the dataset
@@ -346,7 +347,34 @@ def visualize_simplified_correlation(df):
     plt.show()
 
 # Apply the function to your DataFrame
-visualize_simplified_correlation(df)
+#visualize_simplified_correlation(df)
+
+def visualize_correlation_genre(df):
+    le = LabelEncoder()
+    df['music_genre_encoded'] = le.fit_transform(df['music_genre'])
+
+    # Select a meaningful subset of features
+    selected_features = [
+        'popularity', 'acousticness', 'danceability', 'energy', 
+        'loudness', 'speechiness', 'valence', 'tempo', 'music_genre_encoded'
+    ]
+
+    # Ensure only these selected features are used
+    df_selected = df[selected_features]
+
+    # Calculate the correlation matrix for the selected features
+    correlation_matrix = df_selected.corr()
+
+    # Heatmap to visualize the correlation matrix
+    plt.figure(figsize=(12, 10))  # Adjust size as needed
+    sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm', center=0, vmin=-1, vmax=1)
+    plt.title('Correlation Matrix of Selected Features and Music Genre')
+    plt.show()
+
+# Apply the function to your DataFrame
+visualize_correlation_genre(df)
+
+
 
 
 
