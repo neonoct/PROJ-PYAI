@@ -7,6 +7,8 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import LabelEncoder
 from sklearn.ensemble import RandomForestClassifier
 from scipy.stats import chi2_contingency
+from sklearn.decomposition import PCA
+from sklearn.manifold import TSNE
 
 
 
@@ -377,29 +379,6 @@ def visualize_correlation_genre(df):
 
 #Feature Selection################################
 ####################################################
-
-
-#Chi-Squared Test for Feature Selection -catgorical features
-def encode_categorical_features(df):
-    # Assuming 'key' and 'mode' are categorical features in your dataset
-    encoder = LabelEncoder()
-    df['key_encoded'] = encoder.fit_transform(df['key'])
-    df['mode_encoded'] = encoder.fit_transform(df['mode'])
-    df['music_genre_encoded'] = encoder.fit_transform(df['music_genre'])  # ensure it's encoded for this usage
-    return df
-
-# Create a contingency table and perform Chi-square test
-def perform_chi_square(feature):
-    encode_categorical_features(df)
-    contingency_table = pd.crosstab(df[feature], df['music_genre_encoded'])
-    chi2, p, dof, expected = chi2_contingency(contingency_table)
-    print(f"Chi-square test for {feature}:")
-    print(f"Chi2 statistic: {chi2}, p-value: {p}\n")
-
-# Apply the test to categorical features
-#perform_chi_square('key_encoded')
-#perform_chi_square('mode_encoded')
-
 def plot_key_frequency(df):
     # Plotting the frequency of keys within each genre
     plt.figure(figsize=(14, 8))
@@ -425,7 +404,95 @@ def plot_mode_frequency(df):
 
 #plot_mode_frequency(df)
 
+#Chi-Squared Test for Feature Selection -catgorical features
+def encode_categorical_features(df):
+    # Assuming 'key' and 'mode' are categorical features in your dataset
+    encoder = LabelEncoder()
+    df['key_encoded'] = encoder.fit_transform(df['key'])
+    df['mode_encoded'] = encoder.fit_transform(df['mode'])
+    df['music_genre_encoded'] = encoder.fit_transform(df['music_genre'])  # ensure it's encoded for this usage
+    return df
 
+encode_categorical_features(df)
+
+# Create a contingency table and perform Chi-square test
+def perform_chi_square(feature):
+    contingency_table = pd.crosstab(df[feature], df['music_genre_encoded'])
+    chi2, p, dof, expected = chi2_contingency(contingency_table)
+    print(f"Chi-square test for {feature}:")
+    print(f"Chi2 statistic: {chi2}, p-value: {p}\n")
+
+# Apply the test to categorical features
+#perform_chi_square('key_encoded')
+#perform_chi_square('mode_encoded')
+
+
+#model-based feature selection-random forest
+def feature_ranking(df):
+    # Dropping non-useful non-numeric columns
+    X = df.drop(['music_genre_encoded', 'artist_name', 'track_name', 'obtained_date', 'key', 'mode', 'music_genre'], axis=1)
+
+    # Assuming 'tempo_category' and 'duration_cat' need to be encoded if they haven't been already
+    if 'tempo_category' in X.columns:
+        X['tempo_category_encoded'] = LabelEncoder().fit_transform(X['tempo_category'])
+        X.drop('tempo_category', axis=1, inplace=True)
+    if 'duration_cat' in X.columns:
+        X['duration_cat_encoded'] = LabelEncoder().fit_transform(X['duration_cat'])
+        X.drop('duration_cat', axis=1, inplace=True)
+
+    y = df['music_genre_encoded']
+
+    # Initialize and fit the random forest
+    forest = RandomForestClassifier(n_estimators=100, random_state=42)
+    forest.fit(X, y)
+
+    # Get feature importances
+    importances = forest.feature_importances_
+    indices = np.argsort(importances)[::-1]
+
+    # Print the feature rankings
+    print("Feature ranking:")
+    for f in range(X.shape[1]):
+        print(f"{f + 1}. feature {X.columns[indices[f]]} ({importances[indices[f]]})")
+
+feature_ranking(df)
+#dropped columns are: 'music_genre_encoded', 'artist_name', 'track_name', 'obtained_date', 'key', 'mode', 'music_genre'
+
+
+
+#PCA (Principal Component Analysis): 
+def apply_pca(df):
+    # X = df.drop(['music_genre_encoded', 'artist_name', 'track_name', 'obtained_date', 'key', 'mode', 'music_genre'], axis=1)
+    # y = df['music_genre_encoded']
+    
+    pca = PCA(n_components=2)  # Adjust components based on the variance ratio you wish to preserve
+    X_pca = pca.fit_transform(X)
+
+    plt.figure(figsize=(8, 6))
+    plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y, cmap='viridis', edgecolor='k', s=50)
+    plt.title('PCA of Dataset')
+    plt.xlabel('Principal Component 1')
+    plt.ylabel('Principal Component 2')
+    plt.colorbar()
+    plt.show()
+
+#apply_pca(df)
+
+#t-SNE (t-distributed Stochastic Neighbor Embedding)
+
+def apply_tsne(df):
+    tsne = TSNE(n_components=2, random_state=42)
+    X_tsne = tsne.fit_transform(X)
+
+    plt.figure(figsize=(8, 6))
+    plt.scatter(X_tsne[:, 0], X_tsne[:, 1], c=y, cmap='viridis', edgecolor='k', s=50)
+    plt.title('t-SNE visualization of Dataset')
+    plt.xlabel('t-SNE Feature 1')
+    plt.ylabel('t-SNE Feature 2')
+    plt.colorbar()
+    plt.show()
+
+#apply_tsne(df)
 
 
 
