@@ -224,3 +224,48 @@ Feature ranking:
 34. feature mode_encoded (0.007045803227633335)
 35. feature tempo_category_encoded (0.005556088599016663)
 
+the accuracy is slightly changed after the function:train_random_forest(df): with this features
+    important_features = [
+        'popularity', 'speechiness', 'instance_id', 'instrumentalness', 'valence',
+        'acoustic_instrumental_ratio', 'danceability', 'loudness', 'duration_ms',
+        'danceability loudness_poly', 'energy_danceability'
+        # Add other features based on your importance threshold
+    ]
+Accuracy: 0.53
+Feature ranking:
+1. feature popularity (0.132532089444659)
+2. feature speechiness (0.05397555291125378)
+3. feature instance_id (0.04296592915139299)
+4. feature instrumentalness (0.04289914115885833)
+5. feature valence (0.03616612523238922)
+6. feature acoustic_instrumental_ratio (0.0356815477413875)
+7. feature danceability loudness_poly (0.03223929219731261)
+8. feature loudness (0.0322018067412431)
+9. feature danceability (0.031926394392380424)
+10. feature duration_ms (0.0312845708811962)
+11. feature energy_danceability (0.031148783011055937)
+12. feature loudness acousticness_poly (0.02947802055781315)
+13. feature acousticness (0.029309213277403576)
+14. feature danceability acousticness_poly (0.028944472150773823)
+15. feature loudness_scaled (0.026919979894170006)
+16. feature acousticness^2_poly (0.026807858718324362)
+17. feature energy acousticness_poly (0.026022147731647127)
+18. feature loudness^2_poly (0.024321268374129026)
+19. feature energy danceability_poly (0.024063143793931173)
+20. feature energy loudness_poly (0.02357562622414426)
+21. feature energy (0.022945309461746343)
+22. feature liveness (0.022252933288932693)
+23. feature loudness_energy (0.02210281676490911)
+24. feature danceability^2_poly (0.021811360836535808)
+25. feature energy^2_poly (0.020690433237466284)
+26. feature tempo danceability_poly (0.01957246862214944)
+27. feature tempo^2_poly (0.01907591569531746)
+28. feature tempo (0.018945408355271694)
+29. feature tempo loudness_poly (0.018367793151831322)
+30. feature tempo energy_poly (0.018303992701764537)
+31. feature tempo acousticness_poly (0.018289193252834422)
+32. feature key_encoded (0.014070240108954553)
+33. feature duration_cat_encoded (0.008417944300333732)
+34. feature mode_encoded (0.007107077549189115)
+35. feature tempo_category_encoded (0.005584149087297819)
+Accuracy with refined features: 0.54

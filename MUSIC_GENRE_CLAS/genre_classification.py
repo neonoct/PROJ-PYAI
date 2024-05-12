@@ -9,7 +9,8 @@ from sklearn.ensemble import RandomForestClassifier
 from scipy.stats import chi2_contingency
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
-
+from sklearn.metrics import accuracy_score
+from sklearn.model_selection import train_test_split
 
 
 # Load the dataset
@@ -442,9 +443,19 @@ def feature_ranking(df):
 
     y = df['music_genre_encoded']
 
+    # Splitting the dataset into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
     # Initialize and fit the random forest
     forest = RandomForestClassifier(n_estimators=100, random_state=42)
-    forest.fit(X, y)
+    forest.fit(X_train, y_train)
+
+    # Predict on the test set
+    y_pred = forest.predict(X_test)
+
+    # Calculate accuracy
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"Accuracy: {accuracy:.2f}")
 
     # Get feature importances
     importances = forest.feature_importances_
@@ -454,9 +465,51 @@ def feature_ranking(df):
     print("Feature ranking:")
     for f in range(X.shape[1]):
         print(f"{f + 1}. feature {X.columns[indices[f]]} ({importances[indices[f]]})")
+    
+    return accuracy # Return the accuracy for comparison
 
 feature_ranking(df)
 #dropped columns are: 'music_genre_encoded', 'artist_name', 'track_name', 'obtained_date', 'key', 'mode', 'music_genre'
+
+
+
+def train_random_forest(df):
+    important_features = [
+        'popularity', 'speechiness', 'instance_id', 'instrumentalness', 'valence',
+        'acoustic_instrumental_ratio', 'danceability', 'loudness', 'duration_ms',
+        'danceability loudness_poly', 'energy_danceability'
+        # Add other features based on your importance threshold
+    ]
+
+    X = df[important_features]
+    y = df['music_genre_encoded']
+
+    # Splitting the dataset into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Initialize and train the random forest on the refined feature set
+    forest_refined = RandomForestClassifier(n_estimators=100, random_state=42)
+    forest_refined.fit(X_train, y_train)
+
+    # Predict on the test set
+    y_pred = forest_refined.predict(X_test)
+
+    # Calculate accuracy
+    accuracy_refined = accuracy_score(y_test, y_pred)
+    print(f"Accuracy with refined features: {accuracy_refined:.2f}")
+
+    # Compare this accuracy with the previous model's accuracy
+    return accuracy_refined
+
+train_random_forest(df)
+
+
+
+
+
+
+
+
 
 
 
@@ -466,6 +519,7 @@ def apply_pca(df):
     # y = df['music_genre_encoded']
     
     pca = PCA(n_components=2)  # Adjust components based on the variance ratio you wish to preserve
+    X=df#assuming that the data is already preprocessed
     X_pca = pca.fit_transform(X)
 
     plt.figure(figsize=(8, 6))
@@ -482,6 +536,7 @@ def apply_pca(df):
 
 def apply_tsne(df):
     tsne = TSNE(n_components=2, random_state=42)
+    X=df#assuming that the data is already preprocessed
     X_tsne = tsne.fit_transform(X)
 
     plt.figure(figsize=(8, 6))
