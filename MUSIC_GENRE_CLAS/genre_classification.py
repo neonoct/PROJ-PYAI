@@ -126,7 +126,7 @@ def create_interaction_features(df):
     
     return df
 
-df = create_interaction_features(df)
+#df = create_interaction_features(df)
 
 #aggregate features
 
@@ -134,7 +134,7 @@ def create_acoustic_instrumental_ratio(df):
     df['acoustic_instrumental_ratio'] = df['acousticness'] / (df['instrumentalness'] + 0.001)
     return df
 
-create_acoustic_instrumental_ratio(df)
+#create_acoustic_instrumental_ratio(df)
 
 #Categorical Binning of Continuous Variables
 
@@ -147,7 +147,7 @@ def create_categorical_features(df):
     
     return df
 
-create_categorical_features(df)
+#create_categorical_features(df)
 
 #polynomial features
 
@@ -189,7 +189,7 @@ def generate_polynomial_features(df):
 #print(df.dtypes)
 
 
-df = generate_polynomial_features(df)#total number of polynomial features generated is 21
+#df = generate_polynomial_features(df)#total number of polynomial features generated is 21
 
 #or if it is the second time with the same column name
 new_column_names = []
@@ -428,11 +428,11 @@ def perform_chi_square(feature):
 #perform_chi_square('key_encoded')
 #perform_chi_square('mode_encoded')
 
-
+#new best parameters found with the grid search Best parameters found:  {'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 1, 'min_samples_split': 5, 'n_estimators': 300}
 #model-based feature selection-random forest
 def feature_ranking(df):
     # Dropping non-useful non-numeric columns
-    X = df.drop(['instance_id','music_genre_encoded', 'artist_name', 'track_name', 'obtained_date', 'key', 'mode', 'music_genre', 'loudness_scaled'], axis=1)
+    X = df.drop(['music_genre_encoded', 'artist_name', 'track_name', 'obtained_date', 'key', 'mode', 'music_genre','instance_id'], axis=1)
 
     # Assuming 'tempo_category' and 'duration_cat' need to be encoded if they haven't been already
     if 'tempo_category' in X.columns:
@@ -453,7 +453,7 @@ def feature_ranking(df):
         max_depth=10,
         max_features='sqrt',
         min_samples_leaf=1,
-        min_samples_split=2,
+        min_samples_split=5,
         random_state=42
     )
     forest.fit(X_train, y_train)
@@ -483,11 +483,9 @@ feature_ranking(df)
 
 def train_random_forest(df):
     important_features = [
-        'popularity', 'speechiness',  'instrumentalness', 
-        'acoustic_instrumental_ratio', 'loudness','danceability acousticness_poly',
-        'danceability loudness_poly','loudness acousticness_poly',
-        'energy_danceability','danceability','acousticness',
-        'energy loudness_poly','valence','energy','acousticness^2_poly','loudness_energy','duration_ms'
+        'popularity','loudness','instrumentalness','speechiness',
+        'acousticness','danceability','energy','valence',
+        'duration_ms','tempo'
   
 
 
@@ -510,7 +508,7 @@ def train_random_forest(df):
         max_depth=10,
         max_features='sqrt',
         min_samples_leaf=1,
-        min_samples_split=2,
+        min_samples_split=5,
         random_state=42
     )
     forest_refined.fit(X_train, y_train)
@@ -530,9 +528,9 @@ train_random_forest(df)
 
 def train_random_forest_with_hyperparameter_tuning(df):
     # Assuming the important features and encoded target are already defined
-    X = df[['popularity', 'speechiness', 'instance_id', 'instrumentalness', 'valence',
-            'acoustic_instrumental_ratio', 'danceability', 'loudness', 'duration_ms',
-            'danceability loudness_poly', 'energy_danceability']]
+    X = df[['popularity','loudness','instrumentalness','speechiness',
+        'acousticness','danceability','energy','valence',
+        'duration_ms','tempo']]
     y = df['music_genre_encoded']
 
     # Split the data into training and testing sets

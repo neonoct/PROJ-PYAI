@@ -74,7 +74,7 @@ def create_interaction_features(df):
     
     return df
 
-df = create_interaction_features(df)
+#df = create_interaction_features(df)
 
 
 
@@ -84,7 +84,7 @@ def create_acoustic_instrumental_ratio(df):
     df['acoustic_instrumental_ratio'] = df['acousticness'] / (df['instrumentalness'] + 0.001)
     return df
 
-create_acoustic_instrumental_ratio(df)
+#create_acoustic_instrumental_ratio(df)
 
 #Categorical Binning of Continuous Variables
 
@@ -97,7 +97,7 @@ def create_categorical_features(df):
     
     return df
 
-create_categorical_features(df)
+#create_categorical_features(df)
 
 
 
@@ -141,7 +141,7 @@ def generate_polynomial_features(df):
 #db info
 
 
-df = generate_polynomial_features(df)#total number of polynomial features generated is 21
+#df = generate_polynomial_features(df)#total number of polynomial features generated is 21
 
 
 
@@ -189,7 +189,7 @@ encode_categorical_features(df)
 #model-based feature selection-random forest
 def feature_ranking(df):
     # Dropping non-useful non-numeric columns
-    X = df.drop(['music_genre_encoded', 'artist_name', 'track_name', 'obtained_date', 'key', 'mode', 'music_genre'], axis=1)
+    X = df.drop(['music_genre_encoded', 'artist_name', 'track_name', 'obtained_date', 'key', 'mode', 'music_genre','instance_id'], axis=1)
 
     # Assuming 'tempo_category' and 'duration_cat' need to be encoded if they haven't been already
     if 'tempo_category' in X.columns:
@@ -210,7 +210,7 @@ def feature_ranking(df):
         max_depth=10,
         max_features='sqrt',
         min_samples_leaf=1,
-        min_samples_split=2,
+        min_samples_split=5,
         random_state=42
     )
     forest.fit(X_train, y_train)
@@ -226,10 +226,10 @@ def feature_ranking(df):
     importances = forest.feature_importances_
     indices = np.argsort(importances)[::-1]
 
-    # Print the feature rankings
-    # print("Feature ranking:")
-    # for f in range(X.shape[1]):
-    #     print(f"{f + 1}. feature {X.columns[indices[f]]} ({importances[indices[f]]})")
+    #Print the feature rankings
+    print("Feature ranking:")
+    for f in range(X.shape[1]):
+        print(f"{f + 1}. feature {X.columns[indices[f]]} ({importances[indices[f]]})")
     
     return accuracy # Return the accuracy for comparison
 
@@ -243,10 +243,9 @@ print('after feature ranking');
 
 def train_random_forest(df):
     important_features = [
-        'popularity', 'speechiness', 'instance_id', 'instrumentalness', 'valence',
-        'acoustic_instrumental_ratio', 'danceability', 'loudness', 'duration_ms',
-        'danceability loudness_poly', 'energy_danceability'
-        # Add other features based on your importance threshold
+        'popularity','loudness','instrumentalness','speechiness',
+        'acousticness','danceability','energy','valence',
+        'duration_ms','tempo'
     ]
     #tried with other combinations too but this one gave the best accuracy
 
@@ -265,7 +264,7 @@ def train_random_forest(df):
         max_depth=10,
         max_features='sqrt',
         min_samples_leaf=1,
-        min_samples_split=2,
+        min_samples_split=5,
         random_state=42
     )
     forest_refined.fit(X_train, y_train)
@@ -285,9 +284,11 @@ train_random_forest(df)
 
 def train_random_forest_with_hyperparameter_tuning(df):
     # Assuming the important features and encoded target are already defined
-    X = df[['popularity', 'speechiness', 'instance_id', 'instrumentalness', 'valence',
-            'acoustic_instrumental_ratio', 'danceability', 'loudness', 'duration_ms',
-            'danceability loudness_poly', 'energy_danceability']]
+    X = df[[
+        'popularity','loudness','instrumentalness','speechiness',
+        'acousticness','danceability','energy','valence',
+        'duration_ms','tempo'
+            ]]
     y = df['music_genre_encoded']
 
     # Split the data into training and testing sets
@@ -296,7 +297,7 @@ def train_random_forest_with_hyperparameter_tuning(df):
     # Set the parameters by cross-validation
     param_grid = {
         'n_estimators': [100, 200, 300],  # Number of trees in random forest
-        'max_features': ['auto', 'sqrt'],  # Number of features to consider at every split
+        'max_features': ['sqrt'],  # Number of features to consider at every split
         'max_depth': [10, 20, 30, None],  # Maximum number of levels in tree
         'min_samples_split': [2, 5, 10],  # Minimum number of samples required to split a node
         'min_samples_leaf': [1, 2, 4]  # Minimum number of samples required at each leaf node
