@@ -491,7 +491,15 @@ def train_random_forest(df):
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
     # Initialize and train the random forest on the refined feature set
-    forest_refined = RandomForestClassifier(n_estimators=100, random_state=42)
+    #initialize the random forest classifier with the hyperparameters that were found to be optimal
+    forest_refined = RandomForestClassifier(
+        n_estimators=300,
+        max_depth=10,
+        max_features='sqrt',
+        min_samples_leaf=1,
+        min_samples_split=2,
+        random_state=42
+    )
     forest_refined.fit(X_train, y_train)
 
     # Predict on the test set
@@ -506,6 +514,48 @@ def train_random_forest(df):
 
 train_random_forest(df)
 #improvement was not significant from 0.53 to 0.54
+
+def train_random_forest_with_hyperparameter_tuning(df):
+    # Assuming the important features and encoded target are already defined
+    X = df[['popularity', 'speechiness', 'instance_id', 'instrumentalness', 'valence',
+            'acoustic_instrumental_ratio', 'danceability', 'loudness', 'duration_ms',
+            'danceability loudness_poly', 'energy_danceability']]
+    y = df['music_genre_encoded']
+
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Set the parameters by cross-validation
+    param_grid = {
+        'n_estimators': [100, 200, 300],  # Number of trees in random forest
+        'max_features': ['auto', 'sqrt'],  # Number of features to consider at every split
+        'max_depth': [10, 20, 30, None],  # Maximum number of levels in tree
+        'min_samples_split': [2, 5, 10],  # Minimum number of samples required to split a node
+        'min_samples_leaf': [1, 2, 4]  # Minimum number of samples required at each leaf node
+    }
+
+    # Initialize the classifier
+    rf = RandomForestClassifier(random_state=42)
+
+    # Initialize the GridSearchCV object
+    grid_search = GridSearchCV(estimator=rf, param_grid=param_grid, cv=3, verbose=2, n_jobs=-1)
+
+    # Fit the grid search to the data
+    grid_search.fit(X_train, y_train)
+
+    # Best parameters found
+    print("Best parameters found: ", grid_search.best_params_)
+
+    # Evaluate the best grid search model on the test set
+    best_grid = grid_search.best_estimator_
+    y_pred = best_grid.predict(X_test)
+    accuracy = accuracy_score(y_test, y_pred)
+    print(f"Accuracy with the best parameters: {accuracy:.2f}")
+
+#train_random_forest_with_hyperparameter_tuning(df)
+#Best parameters found:  {'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 300}
+#Accuracy: 0.53
+#Accuracy with refined features: 0.56 - after hyperparameter tuning for the random forest classifier
 
 
 
