@@ -296,7 +296,7 @@ def train_random_forest_with_hyperparameter_tuning(df):
 
     # Set the parameters by cross-validation
     param_grid = {
-        'n_estimators': [100, 200, 300],  # Number of trees in random forest
+        'n_estimators': [100, 200, 300,400],  # Number of trees in random forest
         'max_features': ['sqrt'],  # Number of features to consider at every split
         'max_depth': [10, 20, 30, None],  # Maximum number of levels in tree
         'min_samples_split': [2, 5, 10],  # Minimum number of samples required to split a node
@@ -321,7 +321,7 @@ def train_random_forest_with_hyperparameter_tuning(df):
     accuracy = accuracy_score(y_test, y_pred)
     print(f"Accuracy with the best parameters: {accuracy:.2f}")
 
-#train_random_forest_with_hyperparameter_tuning(df)
+train_random_forest_with_hyperparameter_tuning(df)
 #Best parameters found:  {'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 300}
 #Accuracy: 0.53
 #Accuracy with refined features: 0.56 - after hyperparameter tuning for the random forest classifier
