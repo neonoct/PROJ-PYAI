@@ -268,7 +268,7 @@ def plot_histograms(df):
 
 # Boxplots for visualizing outliers--via cptt
 def plot_boxplots(df):
-    for col in ['popularity', 'acousticness', 'danceability', 'energy', 'loudness']:
+    for col in ['popularity', 'acousticness', 'danceability', 'energy', 'loudness', 'speechiness', 'valence', 'tempo']:
         try:
             plt.figure(figsize=(10, 4))
             sns.boxplot(x=df[col])
@@ -280,6 +280,7 @@ def plot_boxplots(df):
 
 
 #plot_boxplots(df)
+
 # Check the content of each column
 def check_content(df):
     for col in df.columns:
@@ -563,10 +564,6 @@ def train_random_forest_with_hyperparameter_tuning(df):
 
 
 
-
-
-
-
 #PCA (Principal Component Analysis): 
 def apply_pca(df):
     # X = df.drop(['music_genre_encoded', 'artist_name', 'track_name', 'obtained_date', 'key', 'mode', 'music_genre'], axis=1)
@@ -586,6 +583,15 @@ def apply_pca(df):
     plt.show()
 
 #apply_pca(df)
+
+
+
+
+
+
+
+
+
 
 #t-SNE (t-distributed Stochastic Neighbor Embedding)
 
