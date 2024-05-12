@@ -10,7 +10,7 @@ from scipy.stats import chi2_contingency
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.metrics import accuracy_score
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV,train_test_split
 
 
 # Load the dataset
@@ -462,9 +462,9 @@ def feature_ranking(df):
     indices = np.argsort(importances)[::-1]
 
     # Print the feature rankings
-    print("Feature ranking:")
-    for f in range(X.shape[1]):
-        print(f"{f + 1}. feature {X.columns[indices[f]]} ({importances[indices[f]]})")
+    # print("Feature ranking:")
+    # for f in range(X.shape[1]):
+    #     print(f"{f + 1}. feature {X.columns[indices[f]]} ({importances[indices[f]]})")
     
     return accuracy # Return the accuracy for comparison
 
@@ -480,6 +480,9 @@ def train_random_forest(df):
         'danceability loudness_poly', 'energy_danceability'
         # Add other features based on your importance threshold
     ]
+    #tried with other combinations too but this one gave the best accuracy
+
+    
 
     X = df[important_features]
     y = df['music_genre_encoded']
@@ -502,6 +505,7 @@ def train_random_forest(df):
     return accuracy_refined
 
 train_random_forest(df)
+#improvement was not significant from 0.53 to 0.54
 
 
 
@@ -521,6 +525,7 @@ def apply_pca(df):
     pca = PCA(n_components=2)  # Adjust components based on the variance ratio you wish to preserve
     X=df#assuming that the data is already preprocessed
     X_pca = pca.fit_transform(X)
+    y = df['music_genre_encoded']
 
     plt.figure(figsize=(8, 6))
     plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y, cmap='viridis', edgecolor='k', s=50)
@@ -537,6 +542,7 @@ def apply_pca(df):
 def apply_tsne(df):
     tsne = TSNE(n_components=2, random_state=42)
     X=df#assuming that the data is already preprocessed
+    y = df['music_genre_encoded']
     X_tsne = tsne.fit_transform(X)
 
     plt.figure(figsize=(8, 6))
