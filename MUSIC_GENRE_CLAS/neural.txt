@@ -1,0 +1,14 @@
+Epoch 47/50
+1000/1000 - 1s - 1ms/step - accuracy: 0.6114 - loss: 0.9827 - val_accuracy: 0.5716 - val_loss: 1.1047
+Epoch 48/50
+1000/1000 - 1s - 1ms/step - accuracy: 0.6125 - loss: 0.9823 - val_accuracy: 0.5686 - val_loss: 1.1109
+Epoch 49/50
+1000/1000 - 1s - 1ms/step - accuracy: 0.6131 - loss: 0.9818 - val_accuracy: 0.5700 - val_loss: 1.1078
+Epoch 50/50
+1000/1000 - 1s - 1ms/step - accuracy: 0.6128 - loss: 0.9803 - val_accuracy: 0.5587 - val_loss: 1.1250
+313/313 - 0s - 2ms/step - accuracy: 0.5742 - loss: 1.0926
+Test accuracy: 0.5741999745368958
+
+Observations:
+Accuracy: The training accuracy reached around 61%, and the validation accuracy is around 56-57%. This indicates some overfitting, where the model performs better on the training data than on the validation data.
+Loss: The training loss and validation loss indicate that there is room for improvement in the model's generalization.
