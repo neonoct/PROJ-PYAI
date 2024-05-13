@@ -20,6 +20,7 @@ from keras.models import Sequential
 from keras.layers import Dense
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_val_score
+from sklearn.svm import SVC
 
 
 # Load the dataset
@@ -86,4 +87,49 @@ df = df.drop(columns=['mode_encoded', 'key_encoded'])
 
 y=df['music_genre_encoded']
 X=df.drop(columns=['music_genre_encoded'])
+
+# Normalize/standardize features
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# Split the data into training and test sets
+X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
+
+# Define the SVM model with default parameters
+svm_model = SVC()
+
+# Fit the model
+svm_model.fit(X_train, y_train)
+
+# Predict on the test set
+y_pred_svm = svm_model.predict(X_test)
+
+# Calculate accuracy
+test_acc_svm = accuracy_score(y_test, y_pred_svm)
+print(f'Test accuracy of SVM: {test_acc_svm}')
+
+# Define the parameter grid for hyperparameter tuning
+param_grid = {
+    'C': [0.1, 1, 10, 100],
+    'kernel': ['linear', 'poly', 'rbf', 'sigmoid'],
+    'gamma': ['scale', 'auto']
+}
+
+# Initialize the GridSearchCV object
+grid_search = GridSearchCV(SVC(), param_grid, cv=5, verbose=2, n_jobs=-1)
+
+# Fit the grid search to the data
+grid_search.fit(X_train, y_train)
+
+# Print the best parameters and best score
+print(f'Best parameters: {grid_search.best_params_}')
+print(f'Best cross-validation accuracy: {grid_search.best_score_}')
+
+# Use the best estimator to make predictions
+best_svm_model = grid_search.best_estimator_
+y_pred_best_svm = best_svm_model.predict(X_test)
+
+# Calculate accuracy
+test_acc_best_svm = accuracy_score(y_test, y_pred_best_svm)
+print(f'Test accuracy of best SVM: {test_acc_best_svm}')
 
