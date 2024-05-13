@@ -8,6 +8,8 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier
 from xgboost import XGBClassifier
+from sklearn.ensemble import VotingClassifier
+from sklearn.metrics import accuracy_score
 
 # Load the dataset
 df = pd.read_csv('./MUSIC_GENRE_CLAS/music_genre.csv')
@@ -113,6 +115,32 @@ def train_xgboost(X, y):
     print(confusion_matrix(y_test, y_pred_xgb))
 
 # Train and evaluate models
-train_decision_tree(X, y)
+#train_decision_tree(X, y)
 #train_random_forest(X, y)
 #train_xgboost(X, y)
+
+# Define the individual models with the best parameters
+decision_tree = DecisionTreeClassifier(
+    criterion='entropy', max_depth=10, min_samples_leaf=1, min_samples_split=10, random_state=42)
+random_forest = RandomForestClassifier(
+    max_depth=10, min_samples_leaf=1, min_samples_split=5, n_estimators=300, random_state=42)
+xgboost = XGBClassifier(
+    learning_rate=0.2, max_depth=3, n_estimators=200, subsample=0.7, random_state=42)
+
+# Combine the models using a Voting Classifier
+voting_model = VotingClassifier(
+    estimators=[('dt', decision_tree), ('rf', random_forest), ('xgb', xgboost)],
+    voting='soft')  # Use 'hard' for majority voting, 'soft' for weighted voting
+
+# Split the data again for training and testing
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Train the Voting Classifier
+voting_model.fit(X_train, y_train)
+
+# Predict and evaluate
+y_pred_voting = voting_model.predict(X_test)
+print(classification_report(y_test, y_pred_voting))
+print(confusion_matrix(y_test, y_pred_voting))
+test_acc_voting = accuracy_score(y_test, y_pred_voting)
+print(f'Test accuracy of Voting Classifier: {test_acc_voting}')
