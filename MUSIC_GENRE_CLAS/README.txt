@@ -333,3 +333,17 @@ Feature ranking:
 16. feature duration_cat_encoded (0.00841303645573031)
 17. feature key_encoded (0.004184464041498095)
 18. feature tempo_category_encoded (0.0027655387105003566)
+
+#PCA
+The outputs from the PCA analysis tell us a couple of key things:
+
+Cumulative Explained Variance Plot:
+
+The plot showing cumulative explained variance helps in understanding how many components are required to capture a substantial amount of information from the dataset. In your plot, it looks like around 10 components capture most of the variance. This suggests that reducing the dataset to these 10 principal components retains the majority of the information.
+PCA Scatter Plot:
+
+The scatter plot of the first two principal components illustrates the spread and clustering of your data when projected onto these two dimensions. While there is a broad spread indicating variability across the data, the lack of distinct, well-separated clusters might suggest that these two components alone do not distinctly separate different genres or categories effectively. The color gradient, which likely represents the density or some ordinal feature, shows some variation across the principal component axes but does not form clear groups.
+Interpretation and Next Steps:
+
+The PCA analysis indicates that while PCA can reduce dimensionality, the first two principal components do not provide clear separations between classes or categories, which might be the case in a dataset with complex and overlapping features like music genres.
+For better visualization and perhaps more insightful data reduction, applying t-SNE might help in revealing non-linear relationships and clusters that PCA might not capture, especially since t-SNE is designed to maintain local relationships between points.

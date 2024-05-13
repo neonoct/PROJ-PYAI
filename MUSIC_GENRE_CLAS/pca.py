@@ -206,11 +206,11 @@ def feature_ranking(df):
 
     # Initialize and fit the random forest
     forest = RandomForestClassifier(
-        n_estimators=300,
+        n_estimators=200,
         max_depth=10,
         max_features='sqrt',
         min_samples_leaf=1,
-        min_samples_split=5,
+        min_samples_split=2,
         random_state=42
     )
     forest.fit(X_train, y_train)
@@ -260,11 +260,11 @@ def train_random_forest(df):
     # Initialize and train the random forest on the refined feature set
     #initialize the random forest classifier with the hyperparameters that were found to be optimal
     forest_refined = RandomForestClassifier(
-        n_estimators=300,
+        n_estimators=200,
         max_depth=10,
         max_features='sqrt',
         min_samples_leaf=1,
-        min_samples_split=5,
+        min_samples_split=2,
         random_state=42
     )
     forest_refined.fit(X_train, y_train)
@@ -321,7 +321,7 @@ def train_random_forest_with_hyperparameter_tuning(df):
     accuracy = accuracy_score(y_test, y_pred)
     print(f"Accuracy with the best parameters: {accuracy:.2f}")
 
-train_random_forest_with_hyperparameter_tuning(df)
+#train_random_forest_with_hyperparameter_tuning(df)
 #Best parameters found:  {'max_depth': 10, 'max_features': 'sqrt', 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 300}
 #Accuracy: 0.53
 #Accuracy with refined features: 0.56 - after hyperparameter tuning for the random forest classifier

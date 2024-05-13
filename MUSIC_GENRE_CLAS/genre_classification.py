@@ -449,11 +449,11 @@ def feature_ranking(df):
 
     # Initialize and fit the random forest
     forest = RandomForestClassifier(
-        n_estimators=300,
+        n_estimators=200,
         max_depth=10,
         max_features='sqrt',
         min_samples_leaf=1,
-        min_samples_split=5,
+        min_samples_split=2,
         random_state=42
     )
     forest.fit(X_train, y_train)
@@ -476,8 +476,9 @@ def feature_ranking(df):
     
     return accuracy # Return the accuracy for comparison
 
-feature_ranking(df)
+#feature_ranking(df)
 #dropped columns are: 'music_genre_encoded', 'artist_name', 'track_name', 'obtained_date', 'key', 'mode', 'music_genre'
+
 
 
 
@@ -504,11 +505,11 @@ def train_random_forest(df):
     # Initialize and train the random forest on the refined feature set
     #initialize the random forest classifier with the hyperparameters that were found to be optimal
     forest_refined = RandomForestClassifier(
-        n_estimators=300,
+        n_estimators=200,
         max_depth=10,
         max_features='sqrt',
         min_samples_leaf=1,
-        min_samples_split=5,
+        min_samples_split=2,
         random_state=42
     )
     forest_refined.fit(X_train, y_train)
@@ -523,7 +524,7 @@ def train_random_forest(df):
     # Compare this accuracy with the previous model's accuracy
     return accuracy_refined
 
-train_random_forest(df)
+#train_random_forest(df)
 #improvement was not significant from 0.53 to 0.54
 
 def train_random_forest_with_hyperparameter_tuning(df):
@@ -538,8 +539,8 @@ def train_random_forest_with_hyperparameter_tuning(df):
 
     # Set the parameters by cross-validation
     param_grid = {
-        'n_estimators': [100, 200, 300],  # Number of trees in random forest
-        'max_features': ['auto', 'sqrt'],  # Number of features to consider at every split
+        'n_estimators': [100, 200, 300,400],  # Number of trees in random forest
+        'max_features': [ 'sqrt'],  # Number of features to consider at every split - 'auto' gave nothing additional
         'max_depth': [10, 20, 30, None],  # Maximum number of levels in tree
         'min_samples_split': [2, 5, 10],  # Minimum number of samples required to split a node
         'min_samples_leaf': [1, 2, 4]  # Minimum number of samples required at each leaf node
@@ -576,27 +577,47 @@ def train_random_forest_with_hyperparameter_tuning(df):
 
 #PCA (Principal Component Analysis): 
 def apply_pca(df):
-    # X = df.drop(['music_genre_encoded', 'artist_name', 'track_name', 'obtained_date', 'key', 'mode', 'music_genre'], axis=1)
-    # y = df['music_genre_encoded']
-    
-    pca = PCA(n_components=2)  # Adjust components based on the variance ratio you wish to preserve
-    X=df#assuming that the data is already preprocessed
-    X_pca = pca.fit_transform(X)
-    y = df['music_genre_encoded']
+    ## Selecting the core features based on their importance
+    core_features = df[['popularity', 'speechiness', 'loudness', 'instrumentalness', 
+                        'danceability', 'energy', 'acousticness', 'valence', 'duration_ms', 
+                        'tempo', 'mode_encoded', 'liveness', 'key_encoded']]
 
+    # Scaling the data
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(core_features)
+
+    # Applying PCA
+    pca = PCA(n_components=0.95)  # Retain 95% of the variance
+    X_pca = pca.fit_transform(X_scaled)
+    print("Number of components:", pca.n_components_)
+
+    # Visualizing the variance explained by each component
+    plt.figure(figsize=(10, 6))
+    plt.plot(np.cumsum(pca.explained_variance_ratio_))
+    plt.xlabel('Number of Components')
+    plt.ylabel('Cumulative Explained Variance')
+    plt.show()
+
+    # Optionally, plot the first two principal components
     plt.figure(figsize=(8, 6))
-    plt.scatter(X_pca[:, 0], X_pca[:, 1], c=y, cmap='viridis', edgecolor='k', s=50)
-    plt.title('PCA of Dataset')
+    plt.scatter(X_pca[:, 0], X_pca[:, 1], c=df['music_genre_encoded'], cmap='viridis', edgecolor='k', alpha=0.5)
     plt.xlabel('Principal Component 1')
     plt.ylabel('Principal Component 2')
     plt.colorbar()
+    plt.title('PCA: Projection onto the first two principal components')
     plt.show()
 
 #apply_pca(df)
 
+#PCA suggest that the data is not separable in the first two principal components
+#the PCA also suggests that the total of 10 components are needed to explain 95% of the variance in the data which also gets along with the features from the random forest classifier
+#the 10 components in Random Forest Classifier also give the most accurate results
 
 
-
+#####DROPPPP#####
+#print(df.info())
+#drop key and mode columns,instance_id,artist_name,track_name,obtained_date
+#df = df.drop(['key', 'mode', 'instance_id', 'artist_name', 'track_name', 'obtained_date'], axis=1)
 
 
 
@@ -605,13 +626,16 @@ def apply_pca(df):
 
 #t-SNE (t-distributed Stochastic Neighbor Embedding)
 
-def apply_tsne(df):
+def apply_tsne0(df):
     tsne = TSNE(n_components=2, random_state=42)
-    X=df#assuming that the data is already preprocessed
+    X=df[[
+        'popularity', 'speechiness', 'loudness', 'instrumentalness', 
+        'danceability', 'energy', 'acousticness', 'valence', 'duration_ms', 
+        'tempo', 'mode_encoded', 'liveness', 'key_encoded']]
     y = df['music_genre_encoded']
     X_tsne = tsne.fit_transform(X)
 
-    plt.figure(figsize=(8, 6))
+    plt.figure(figsize=(10, 8))
     plt.scatter(X_tsne[:, 0], X_tsne[:, 1], c=y, cmap='viridis', edgecolor='k', s=50)
     plt.title('t-SNE visualization of Dataset')
     plt.xlabel('t-SNE Feature 1')
@@ -619,7 +643,47 @@ def apply_tsne(df):
     plt.colorbar()
     plt.show()
 
-#apply_tsne(df)
+#apply_tsne0(df)
+
+def apply_tsne(df):
+    """
+    Applies t-SNE dimensionality reduction to visualize high-dimensional data.
+    Args:
+    df (DataFrame): A pandas DataFrame with the required features and encoded labels.
+
+    Returns:
+    None: This function plots the t-SNE visualization.
+    """
+    # Check if required columns are present
+    required_columns = ['popularity', 'speechiness', 'loudness', 'instrumentalness', 
+                        'danceability', 'energy', 'acousticness', 'valence', 'duration_ms', 
+                        'tempo', 'mode_encoded', 'liveness', 'key_encoded', 'music_genre_encoded']
+    if not all(column in df.columns for column in required_columns):
+        raise ValueError("Dataframe does not contain all required columns.")
+
+    # Select features and target
+    X = df[required_columns[:-1]]
+    y = df['music_genre_encoded']
+    
+    # Standardize features
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+
+    # Apply t-SNE
+    tsne = TSNE(n_components=2, random_state=42)
+    X_tsne = tsne.fit_transform(X_scaled)
+
+    # Plotting
+    plt.figure(figsize=(10, 8))
+    scatter = plt.scatter(X_tsne[:, 0], X_tsne[:, 1], c=y, cmap='viridis', edgecolor='k', s=50)
+    plt.title('t-SNE visualization of Dataset')
+    plt.xlabel('t-SNE Feature 1')
+    plt.ylabel('t-SNE Feature 2')
+    plt.colorbar(scatter)
+    plt.show()
+
+# Usage
+apply_tsne(df)  # Replace 'dataframe' with your actual dataframe variable name
 
 
 
