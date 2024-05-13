@@ -607,6 +607,9 @@ def apply_pca(df):
     plt.title('PCA: Projection onto the first two principal components')
     plt.show()
 
+    
+
+
 #apply_pca(df)
 
 #PCA suggest that the data is not separable in the first two principal components
@@ -683,7 +686,119 @@ def apply_tsne(df):
     plt.show()
 
 # Usage
-apply_tsne(df)  # Replace 'dataframe' with your actual dataframe variable name
+#apply_tsne(df)  # Replace 'dataframe' with your actual dataframe variable name
+
+def test_tsne(features, labels, perplexities, learning_rates, iterations=1000):
+    results = []
+    for perplexity in perplexities:
+        for learning_rate in learning_rates:
+            tsne = TSNE(n_components=2, perplexity=perplexity, learning_rate=learning_rate, 
+                        n_iter=iterations, random_state=42)
+            X_tsne = tsne.fit_transform(features)
+            # Visualize or save the result
+            plt.figure(figsize=(10, 8))
+            plt.scatter(X_tsne[:, 0], X_tsne[:, 1], c=labels, cmap='viridis', edgecolor='k', s=50)
+            plt.title(f't-SNE with Perplexity {perplexity} and Learning Rate {learning_rate}')
+            plt.xlabel('t-SNE Feature 1')
+            plt.ylabel('t-SNE Feature 2')
+            plt.colorbar()
+            plt.show()
+            # Log the settings and any metrics or observations
+            results.append((perplexity, learning_rate, X_tsne))
+    return results
+
+# # Define the parameters to test
+# perplexities = [5, 30, 50]
+# learning_rates = [100, 200,500]
+# X=df[[
+#     'popularity', 'speechiness', 'loudness', 'instrumentalness', 
+#     'danceability', 'energy', 'acousticness', 'valence', 'duration_ms', 
+#     'tempo', 'mode_encoded', 'liveness', 'key_encoded']]
+# y = df['music_genre_encoded']
+# test_tsne(X, y, perplexities, learning_rates)
 
 
+def apply_pca_re(df):
+    # Selecting the core features based on their importance
+    core_features = df[['popularity', 'speechiness', 'loudness', 'instrumentalness', 
+                        'danceability', 'energy', 'acousticness', 'valence', 'duration_ms', 
+                        'tempo', 'mode_encoded', 'liveness', 'key_encoded']]
+
+    # Scaling the data
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(core_features)
+
+    # Applying PCA
+    pca = PCA(n_components=0.95)  # Retain 95% of the variance
+    X_pca = pca.fit_transform(X_scaled)
+
+    # Output the number of components
+    print("Number of components:", pca.n_components_)
+
+    # Extract and display component loadings
+    loadings = pd.DataFrame(pca.components_.T, columns=[f'PC{i+1}' for i in range(pca.n_components_)],
+                            index=core_features.columns)
+    print(loadings)
+
+    # Visualizing the variance explained by each component
+    plt.figure(figsize=(10, 6))
+    plt.plot(np.cumsum(pca.explained_variance_ratio_))
+    plt.xlabel('Number of Components')
+    plt.ylabel('Cumulative Explained Variance')
+    plt.show()
+
+    # Optionally, plot the first two principal components
+    plt.figure(figsize=(8, 6))
+    plt.scatter(X_pca[:, 0], X_pca[:, 1], c=df['music_genre_encoded'], cmap='viridis', edgecolor='k', alpha=0.5)
+    plt.xlabel('Principal Component 1')
+    plt.ylabel('Principal Component 2')
+    plt.colorbar()
+    plt.title('PCA: Projection onto the first two principal components')
+    plt.show()
+
+# Replace 'df' with your actual DataFrame name when calling this function
+#apply_pca_re(df)
+
+def plot_correlation_matrix(df):
+    # Compute the correlation matrix for the features in your dataset
+    correlation_matrix = df[['popularity', 'speechiness', 'loudness', 'instrumentalness', 
+                             'danceability', 'energy', 'acousticness', 'valence', 'duration_ms', 
+                             'tempo', 'mode_encoded', 'liveness', 'key_encoded']].corr()
+
+    # Plot the correlation matrix
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm')
+    plt.title('Correlation Matrix of Features')
+    plt.show()
+
+# Replace 'df' with your actual DataFrame name when calling this function
+#plot_correlation_matrix(df)
+
+def calculate_reconstruction_error(df):
+        # Select the core features based on their importance
+    core_features = df[['popularity', 'speechiness', 'loudness', 'instrumentalness', 
+                        'danceability', 'energy', 'acousticness', 'valence', 'duration_ms', 
+                        'tempo', 'mode_encoded', 'liveness', 'key_encoded']]
+    
+    # Scale the data
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(core_features)
+
+    # Apply PCA to retain 95% of the variance
+    pca = PCA(n_components=0.95)
+    pca.fit(X_scaled)
+
+    # Reconstruct data from the PCA components
+    X_reconstructed = pca.inverse_transform(pca.transform(X_scaled))
+
+    # Calculate and return the mean squared error of reconstruction
+    mse = np.mean((X_scaled - X_reconstructed) ** 2)
+    return mse
+
+# You can calculate the reconstruction error after applying PCA to see the impact of dimensionality reduction
+# Replace 'pca' and 'X_scaled' with your actual PCA model and scaled data
+
+
+#error = calculate_reconstruction_error(df)
+#print("Reconstruction MSE:", error)
 

@@ -10,6 +10,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import GridSearchCV
+from sklearn.decomposition import PCA
 
 # Load the dataset
 df = pd.read_csv('./MUSIC_GENRE_CLAS/music_genre.csv')
@@ -233,11 +234,11 @@ def feature_ranking(df):
     
     return accuracy # Return the accuracy for comparison
 
-feature_ranking(df)
+#feature_ranking(df)
 #dropped columns are: 'music_genre_encoded', 'artist_name', 'track_name', 'obtained_date', 'key', 'mode', 'music_genre'
 
 #describe the dataset
-print('after feature ranking');
+#print('after feature ranking');
 
 
 
@@ -279,7 +280,7 @@ def train_random_forest(df):
     # Compare this accuracy with the previous model's accuracy
     return accuracy_refined
 
-train_random_forest(df)
+#train_random_forest(df)
 #improvement was not significant from 0.53 to 0.54
 
 def train_random_forest_with_hyperparameter_tuning(df):
@@ -326,6 +327,103 @@ def train_random_forest_with_hyperparameter_tuning(df):
 #Accuracy: 0.53
 #Accuracy with refined features: 0.56 - after hyperparameter tuning for the random forest classifier
 
+# #take 10 percent from the each genre to create a test set
+# def create_test_set(df):
+#     test_set = pd.DataFrame()
+#     for genre in df['music_genre'].unique():
+#         genre_data = df[df['music_genre'] == genre]
+#         test_data = genre_data.sample(frac=0.1, random_state=42)
+#         test_set = pd.concat([test_set, test_data])
+
+#     return test_set
+
+# test_set = create_test_set(df)
+# #save the test set to a csv file
+# test_set.to_csv('./MUSIC_GENRE_CLAS/test_set1.csv', index=False)
 
 
+print('BURDAN')
 
+def apply_pca(df):
+    # Selecting the core features based on their importance
+    core_features = df[['popularity', 'speechiness', 'loudness', 'instrumentalness', 
+                        'danceability', 'energy', 'acousticness', 'valence', 'duration_ms', 
+                        'tempo', 'mode_encoded', 'liveness', 'key_encoded']]
+
+    # Scaling the data
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(core_features)
+
+    # Applying PCA
+    pca = PCA(n_components=0.95)  # Retain 95% of the variance
+    X_pca = pca.fit_transform(X_scaled)
+
+    # Output the number of components
+    print("Number of components:", pca.n_components_)
+
+    # Extract and display component loadings
+    loadings = pd.DataFrame(pca.components_.T, columns=[f'PC{i+1}' for i in range(pca.n_components_)],
+                            index=core_features.columns)
+    print(loadings)
+
+    # Visualizing the variance explained by each component
+    plt.figure(figsize=(10, 6))
+    plt.plot(np.cumsum(pca.explained_variance_ratio_))
+    plt.xlabel('Number of Components')
+    plt.ylabel('Cumulative Explained Variance')
+    plt.show()
+
+    # Optionally, plot the first two principal components
+    plt.figure(figsize=(8, 6))
+    plt.scatter(X_pca[:, 0], X_pca[:, 1], c=df['music_genre_encoded'], cmap='viridis', edgecolor='k', alpha=0.5)
+    plt.xlabel('Principal Component 1')
+    plt.ylabel('Principal Component 2')
+    plt.colorbar()
+    plt.title('PCA: Projection onto the first two principal components')
+    plt.show()
+
+# Replace 'df' with your actual DataFrame name when calling this function
+apply_pca(df)
+
+def plot_correlation_matrix(df):
+    # Compute the correlation matrix for the features in your dataset
+    correlation_matrix = df[['popularity', 'speechiness', 'loudness', 'instrumentalness', 
+                             'danceability', 'energy', 'acousticness', 'valence', 'duration_ms', 
+                             'tempo', 'mode_encoded', 'liveness', 'key_encoded']].corr()
+
+    # Plot the correlation matrix
+    plt.figure(figsize=(12, 10))
+    sns.heatmap(correlation_matrix, annot=True, fmt=".2f", cmap='coolwarm')
+    plt.title('Correlation Matrix of Features')
+    plt.show()
+
+# Replace 'df' with your actual DataFrame name when calling this function
+plot_correlation_matrix(df)
+
+def calculate_reconstruction_error(df):
+        # Select the core features based on their importance
+    core_features = df[['popularity', 'speechiness', 'loudness', 'instrumentalness', 
+                        'danceability', 'energy', 'acousticness', 'valence', 'duration_ms', 
+                        'tempo', 'mode_encoded', 'liveness', 'key_encoded']]
+    
+    # Scale the data
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(core_features)
+
+    # Apply PCA to retain 95% of the variance
+    pca = PCA(n_components=0.95)
+    pca.fit(X_scaled)
+
+    # Reconstruct data from the PCA components
+    X_reconstructed = pca.inverse_transform(pca.transform(X_scaled))
+
+    # Calculate and return the mean squared error of reconstruction
+    mse = np.mean((X_scaled - X_reconstructed) ** 2)
+    return mse
+
+# You can calculate the reconstruction error after applying PCA to see the impact of dimensionality reduction
+# Replace 'pca' and 'X_scaled' with your actual PCA model and scaled data
+
+
+error = calculate_reconstruction_error(df)
+print("Reconstruction MSE:", error)

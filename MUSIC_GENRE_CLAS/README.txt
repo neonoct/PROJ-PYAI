@@ -347,3 +347,40 @@ Interpretation and Next Steps:
 
 The PCA analysis indicates that while PCA can reduce dimensionality, the first two principal components do not provide clear separations between classes or categories, which might be the case in a dataset with complex and overlapping features like music genres.
 For better visualization and perhaps more insightful data reduction, applying t-SNE might help in revealing non-linear relationships and clusters that PCA might not capture, especially since t-SNE is designed to maintain local relationships between points.
+
+#PCA NEW#
+Number of components: 11
+                       PC1       PC2       PC3       PC4       PC5       PC6       PC7       PC8       PC9      PC10      PC11
+popularity       -0.252138 -0.371183  0.073133  0.141343  0.349027  0.317100  0.124621 -0.112229 -0.403261 -0.496934  0.334104
+speechiness      -0.174278 -0.299225  0.420335  0.455140 -0.079352  0.157432 -0.203274  0.327157  0.458561  0.212188  0.242652
+loudness         -0.457064  0.181060 -0.007342 -0.072897  0.100616 -0.015760  0.046512 -0.151311  0.115184  0.055020 -0.070530
+instrumentalness  0.338125  0.099528  0.080595 -0.173498 -0.035162 -0.204953 -0.129742  0.187034  0.397270 -0.721419  0.162920
+danceability     -0.302863 -0.456646 -0.031931 -0.079942 -0.021375 -0.194714  0.081276  0.315680  0.047103 -0.209743 -0.684890
+energy           -0.437833  0.315000  0.018768 -0.095637  0.039213 -0.106492  0.017749 -0.092710  0.221392 -0.042720  0.210901
+acousticness      0.423140 -0.223016 -0.050008  0.102385 -0.161865  0.020907 -0.025612  0.128226 -0.270112  0.162671  0.065795
+valence          -0.276619 -0.123709 -0.275774 -0.207611 -0.324334 -0.392450  0.067374  0.437885 -0.241151  0.081426  0.485627
+duration_ms       0.122823  0.334094  0.252727  0.002868  0.531948 -0.050807  0.422382  0.561692 -0.116880  0.123289 -0.028033
+tempo            -0.146689  0.345370 -0.032722 -0.108495 -0.119030  0.470491 -0.583679  0.393957 -0.282316 -0.110056 -0.151664
+mode_encoded     -0.008021 -0.109051  0.647369 -0.327089  0.137836 -0.402672 -0.394410 -0.176017 -0.286857  0.108439  0.011865
+liveness         -0.084453  0.335644  0.283307  0.568338 -0.441886 -0.246480  0.180326 -0.065777 -0.310352 -0.258003 -0.141850
+key_encoded       0.005408  0.041967 -0.408909  0.475981  0.464476 -0.426451 -0.452627  0.007297 -0.041174  0.003600 -0.014518
+Reconstruction MSE: 0.02826728082332536
+
+With the detailed PCA outputs and additional visual and correlation data you've provided, we can determine which features are crucial to retain based on their influence on the principal components and their roles in explaining the variance within the dataset. Here’s how we can interpret and decide:
+
+Analyzing Component Loadings
+The component loadings show how each original feature influences each principal component. We focus on features that significantly load on the principal components, especially those that are consistently influential across multiple components.
+
+High Loading Features: From your loadings table, features like loudness, energy, acousticness, danceability, and instrumentalness have strong loadings on multiple components. This indicates they are crucial in explaining variance across different dimensions of your data.
+Analyzing Correlation Matrix
+The correlation matrix helps identify redundancies and unique contributions among features:
+
+Highly Correlated Features: If two features are highly correlated (e.g., loudness and energy with a correlation of 0.84), you might consider retaining only one of them in cases where dimension reduction is critical for efficiency.
+Unique Contribution: Features with low correlations to others or that fill unique roles should be retained to preserve diverse information. For example, instrumentalness and acousticness show negative correlations with loudness and energy, adding unique perspectives to your analysis.
+Decision Based on PCA and Domain Relevance
+Retain: Considering both PCA loadings and correlations, retain loudness, energy, acousticness, danceability, and instrumentalness. These features are crucial as they significantly impact the principal components and have distinct roles in music analysis.
+Evaluate Further: Features like valence, tempo, and duration_ms show significant loadings but might be less critical depending on their correlation with more influential features. Valence, for example, has strong loadings and should be retained if emotional content analysis is important.
+Possibly Drop: Less influential features or those that can be represented by others (e.g., mode_encoded and key_encoded) could be dropped if model simplicity and efficiency are prioritized.
+Suggested Approach
+Given the diverse nature of music data, consider retaining a broad set of features for comprehensive analysis, especially when the cost of including more features is not prohibitive. The features suggested to retain are crucial for distinguishing between different types of musical characteristics and genres. Always re-evaluate the impacts of dropping features by assessing model performance and interpretability in subsequent analyses. This balanced approach ensures both efficient data processing and robust analysis capabilities.
+
