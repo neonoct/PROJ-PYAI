@@ -11,6 +11,10 @@ from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import GridSearchCV,train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.model_selection import train_test_split
+
 
 
 # Load the dataset
@@ -572,9 +576,6 @@ def train_random_forest_with_hyperparameter_tuning(df):
 
 
 
-
-
-
 #PCA (Principal Component Analysis): 
 def apply_pca(df):
     ## Selecting the core features based on their importance
@@ -802,3 +803,16 @@ def calculate_reconstruction_error(df):
 #error = calculate_reconstruction_error(df)
 #print("Reconstruction MSE:", error)
 
+def train_and_evaluate_decision_tree(X, y):
+    
+    # Split the data into training and testing sets
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+    
+    # Initialize and train the Decision Tree
+    tree_model = DecisionTreeClassifier(random_state=42)
+    tree_model.fit(X_train, y_train)
+    
+    # Predict and evaluate
+    y_pred_tree = tree_model.predict(X_test)
+    print(classification_report(y_test, y_pred_tree))
+    print(confusion_matrix(y_test, y_pred_tree))
