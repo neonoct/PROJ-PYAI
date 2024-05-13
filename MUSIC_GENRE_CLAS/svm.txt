@@ -173,3 +173,29 @@ kNN: The best test accuracy was around 54% after tuning and applying PCA.
 SVM: The best test accuracy is approximately 58.03% after hyperparameter tuning.
 Given these results, the SVM model has performed the best so far. However, there are still a few steps you could take to potentially improve the model further or confirm its performance robustness:
 
+
+The SVM model with hyperparameter tuning has achieved a test accuracy of approximately 58.03%, which is an improvement over the previous models. The best parameters found were C=10, gamma='scale', and kernel='rbf'.
+
+Summary of Results:
+kNN: The best test accuracy was around 54% after tuning and applying PCA.
+SVM: The best test accuracy is approximately 58.03% after hyperparameter tuning.
+Given these results, the SVM model has performed the best so far. However, there are still a few steps you could take to potentially improve the model further or confirm its performance robustness:
+
+Further Steps:
+Feature Engineering:
+
+Investigate the importance of different features and potentially create new features.
+Perform additional data cleaning if necessary.
+Ensemble Methods:
+
+Try ensemble methods like Random Forest, Gradient Boosting, or XGBoost which can sometimes outperform individual models.
+Cross-Validation:
+
+Ensure that your cross-validation results are consistent by performing repeated cross-validation.
+Ensemble of Models:
+
+Combine predictions from multiple models (e.g., kNN, SVM, Neural Networks) to form an ensemble model.
+Deep Learning Models:
+
+Further optimize neural network architectures and hyperparameters.
+Experiment with advanced architectures like Convolutional Neural Networks (CNNs) if applicable to your features (e.g., spectrograms of audio data).

@@ -1,0 +1,5 @@
+2024-05-13 21:46:04.746163: I tensorflow/core/util/port.cc:113] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+2024-05-13 21:46:07.282145: I tensorflow/core/util/port.cc:113] oneDNN custom operations are on. You may see slightly different numerical results due to floating-point round-off errors from different computation orders. To turn them off, set the environment variable `TF_ENABLE_ONEDNN_OPTS=0`.
+Test accuracy of kNN: 0.4912
+Test accuracy of kNN with PCA: 0.4928
+Average cross-validated accuracy of kNN: 0.5009
