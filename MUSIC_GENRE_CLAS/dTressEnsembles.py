@@ -1,3 +1,6 @@
+#This script is used to train a Decision Tree, Random Forest and XGBoost models to classify music genres based on the features of the dataset.
+#The dataset is preprocessed and the models are trained and evaluated using the classification_report and confusion_matrix functions from the sklearn library.
+#But there is no hyperparameter tuning in this script yet
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,6 +17,7 @@ from sklearn.model_selection import GridSearchCV,train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
+from xgboost import XGBClassifier
 
 # Load the dataset
 df = pd.read_csv('./MUSIC_GENRE_CLAS/music_genre.csv')
@@ -94,5 +98,36 @@ def train_decision_tree(X, y):
     print(confusion_matrix(y_test, y_pred_tree))
 
 # Call the function
-train_decision_tree(X, y)
+#train_decision_tree(X, y)
 
+def train_random_forest(X, y):
+    # Assuming 'X' as features and 'y' as labels
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Initialize and train the Random Forest
+    forest_model = RandomForestClassifier(n_estimators=100, random_state=42)
+    forest_model.fit(X_train, y_train)
+
+    # Predict and evaluate
+    y_pred_forest = forest_model.predict(X_test)
+    print(classification_report(y_test, y_pred_forest))
+    print(confusion_matrix(y_test, y_pred_forest))
+
+# Call the function
+#train_random_forest(X, y)
+
+def train_xgboost(X, y):
+    # Assuming 'X' as features and 'y' as labels
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Initialize and train XGBoost
+    xgb_model = XGBClassifier(random_state=42)
+    xgb_model.fit(X_train, y_train)
+
+    # Predict and evaluate
+    y_pred_xgb = xgb_model.predict(X_test)
+    print(classification_report(y_test, y_pred_xgb))
+    print(confusion_matrix(y_test, y_pred_xgb))
+
+# Call the function
+train_xgboost(X, y)
