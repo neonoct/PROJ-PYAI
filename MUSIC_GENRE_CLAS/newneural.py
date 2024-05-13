@@ -9,15 +9,12 @@ from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, BatchNormalization
 from scikeras.wrappers import KerasClassifier
-#from tensorflow.keras.wrappers.scikit_learn import KerasClassifier
-
-
-
 
 # Load the dataset
 df = pd.read_csv('./MUSIC_GENRE_CLAS/music_genre.csv')
 
 # Drop rows with missing values (where the whole row is missing)
+df is None
 df = df.dropna()
 
 def replace_empty_artist_name(df):
@@ -29,7 +26,6 @@ replace_empty_artist_name(df)
 def replace_negative_duration(df):
     # Calculate the median duration from valid entries
     median_duration = df[df['duration_ms'] > 0]['duration_ms'].median()
-
     # Replace -1 values with the median duration
     df['duration_ms'] = df['duration_ms'].replace(-1, median_duration)
     return df
@@ -84,56 +80,6 @@ X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, 
 y_train_categorical = to_categorical(y_train)
 y_test_categorical = to_categorical(y_test)
 
-def train_and_evaluate_model(X_train, y_train_categorical, X_test, y_test_categorical):
-    # Define the model
-    model = Sequential([
-        Dense(128, activation='relu', input_shape=(X_train.shape[1],)),
-        BatchNormalization(),
-        Dropout(0.5),
-        Dense(64, activation='relu'),
-        BatchNormalization(),
-        Dropout(0.5),
-        Dense(64, activation='relu'),
-        BatchNormalization(),
-        Dropout(0.5),
-        Dense(10, activation='softmax')  # Assuming there are 10 music genres
-    ])
-
-    # Compile the model
-    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
-
-    # Train the model
-    history = model.fit(X_train, y_train_categorical, epochs=100, batch_size=32, validation_split=0.2, verbose=2)
-
-    # Evaluate the model
-    test_loss, test_acc = model.evaluate(X_test, y_test_categorical, verbose=2)
-    print(f'Test accuracy: {test_acc}')
-
-    return model, history
-
-# Train and evaluate the model
-#model, history = train_and_evaluate_model(X_train, y_train_categorical, X_test, y_test_categorical)
-
-# # Plot training & validation accuracy values
-# plt.figure(figsize=(12, 6))
-# plt.plot(history.history['accuracy'])
-# plt.plot(history.history['val_accuracy'])
-# plt.title('Model accuracy')
-# plt.ylabel('Accuracy')
-# plt.xlabel('Epoch')
-# plt.legend(['Train', 'Validation'], loc='upper left')
-# plt.show()
-
-# # Plot training & validation loss values
-# plt.figure(figsize=(12, 6))
-# plt.plot(history.history['loss'])
-# plt.plot(history.history['val_loss'])
-# plt.title('Model loss')
-# plt.ylabel('Loss')
-# plt.xlabel('Epoch')
-# plt.legend(['Train', 'Validation'], loc='upper left')
-# plt.show()
-
 # Define a function to create the model (required for KerasClassifier)
 def create_model(optimizer='adam', neurons=64, dropout_rate=0.5):
     model = Sequential([
@@ -151,14 +97,14 @@ def create_model(optimizer='adam', neurons=64, dropout_rate=0.5):
     model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
     return model
 
-# Create the model
-model = KerasClassifier(build_fn=create_model, verbose=2)
+# Create the KerasClassifier
+model = KerasClassifier(model=create_model, verbose=2)
 
 # Define the grid of hyperparameters to search
 param_grid = {
-    'optimizer': ['adam', 'rmsprop'],
-    'neurons': [32, 64, 128],
-    'dropout_rate': [0.3, 0.5, 0.7],
+    'model__optimizer': ['adam', 'rmsprop'],
+    'model__neurons': [32, 64, 128],
+    'model__dropout_rate': [0.3, 0.5, 0.7],
     'batch_size': [32, 64],
     'epochs': [50, 100]
 }
@@ -176,6 +122,11 @@ print(f'Best cross-validation accuracy: {random_search_result.best_score_}')
 # Evaluate the best model on the test set
 best_model = random_search_result.best_estimator_
 y_pred_best_model = best_model.predict(X_test)
+
+# Convert one-hot encoded predictions back to integer labels
+y_pred_best_model = np.argmax(y_pred_best_model, axis=1)
+
+# Print the evaluation metrics
 print(f'Test accuracy of best model: {accuracy_score(y_test, y_pred_best_model)}')
 print(classification_report(y_test, y_pred_best_model))
 print(confusion_matrix(y_test, y_pred_best_model))
