@@ -1,25 +1,10 @@
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import RandomForestClassifier
-from scipy.stats import chi2_contingency
-from sklearn.decomposition import PCA
-from sklearn.manifold import TSNE
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import GridSearchCV,train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
-from xgboost import XGBClassifier
-from tensorflow.keras.utils import to_categorical
-from keras.models import Sequential
-from keras.layers import Dense
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import cross_val_score
 from sklearn.svm import SVC
 
 

@@ -1,23 +1,12 @@
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import seaborn as sns
 from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import PolynomialFeatures
 from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import RandomForestClassifier
-from scipy.stats import chi2_contingency
 from sklearn.decomposition import PCA
-from sklearn.manifold import TSNE
 from sklearn.metrics import accuracy_score
-from sklearn.model_selection import GridSearchCV,train_test_split
-from sklearn.tree import DecisionTreeClassifier
-from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.model_selection import train_test_split
-from xgboost import XGBClassifier
-from tensorflow.keras.utils import to_categorical
-from keras.models import Sequential
-from keras.layers import Dense
+from sklearn.model_selection import train_test_split
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_val_score
 
@@ -111,21 +100,21 @@ print(f'Test accuracy of kNN: {test_acc_knn}')
 k_values = range(1, 21)
 accuracies = []
 
-for k in k_values:
-    knn_model = KNeighborsClassifier(n_neighbors=k)
-    knn_model.fit(X_train, y_train)
-    y_pred = knn_model.predict(X_test)
-    accuracy = accuracy_score(y_test, y_pred)
-    accuracies.append(accuracy)
+# for k in k_values:
+#     knn_model = KNeighborsClassifier(n_neighbors=k)
+#     knn_model.fit(X_train, y_train)
+#     y_pred = knn_model.predict(X_test)
+#     accuracy = accuracy_score(y_test, y_pred)
+#     accuracies.append(accuracy)
 
-# Plot the accuracy for different k values
-plt.figure(figsize=(10, 6))
-plt.plot(k_values, accuracies, marker='o')
-plt.title('kNN Accuracy for Different k Values')
-plt.xlabel('Number of Neighbors k')
-plt.ylabel('Accuracy')
-plt.grid(True)
-plt.show()
+# # Plot the accuracy for different k values
+# plt.figure(figsize=(10, 6))
+# plt.plot(k_values, accuracies, marker='o')
+# plt.title('kNN Accuracy for Different k Values')
+# plt.xlabel('Number of Neighbors k')
+# plt.ylabel('Accuracy')
+# plt.grid(True)
+# plt.show()
 
 # Different values of k and distance metrics to test
 k_values = range(1, 21)
@@ -134,31 +123,37 @@ metrics = ['euclidean', 'manhattan', 'chebyshev']
 # Dictionary to store the accuracy results
 results = {}
 
-for metric in metrics:
-    accuracies = []
-    for k in k_values:
-        knn_model = KNeighborsClassifier(n_neighbors=k, metric=metric, weights='distance')
-        knn_model.fit(X_train, y_train)
-        y_pred = knn_model.predict(X_test)
-        accuracy = accuracy_score(y_test, y_pred)
-        accuracies.append(accuracy)
-    results[metric] = accuracies
+# for metric in metrics:
+#     accuracies = []
+#     for k in k_values:
+#         knn_model = KNeighborsClassifier(n_neighbors=k, metric=metric, weights='distance')
+#         knn_model.fit(X_train, y_train)
+#         y_pred = knn_model.predict(X_test)
+#         accuracy = accuracy_score(y_test, y_pred)
+#         accuracies.append(accuracy)
+#     results[metric] = accuracies
 
-# Plot the accuracy for different k values and metrics
-plt.figure(figsize=(10, 6))
-for metric in metrics:
-    plt.plot(k_values, results[metric], marker='o', label=f'Metric: {metric}')
-plt.title('kNN Accuracy for Different k Values and Distance Metrics')
-plt.xlabel('Number of Neighbors k')
-plt.ylabel('Accuracy')
-plt.legend()
-plt.grid(True)
-plt.show()
+# # Plot the accuracy for different k values and metrics
+# plt.figure(figsize=(10, 6))
+# for metric in metrics:
+#     plt.plot(k_values, results[metric], marker='o', label=f'Metric: {metric}')
+# plt.title('kNN Accuracy for Different k Values and Distance Metrics')
+# plt.xlabel('Number of Neighbors k')
+# plt.ylabel('Accuracy')
+# plt.legend()
+# plt.grid(True)
+# plt.show()
+
+#show total rows and columns before pca 
+print(X_train.shape)
 
 # Apply PCA to reduce the dimensionality
 pca = PCA(n_components=10)  # Adjust the number of components as needed
 X_train_pca = pca.fit_transform(X_train)
 X_test_pca = pca.transform(X_test)
+
+#show total rows and columns after pca
+print(X_train_pca.shape)
 
 # Define the kNN model with PCA-transformed data
 knn_model_pca = KNeighborsClassifier(n_neighbors=5)
