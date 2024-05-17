@@ -1,3 +1,4 @@
+#try ovo and ova
 import pandas as pd
 import numpy as np
 from sklearn.preprocessing import StandardScaler

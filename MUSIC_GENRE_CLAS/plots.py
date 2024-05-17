@@ -101,7 +101,7 @@ def create_interaction_features(df):
     
     return df
 
-df = create_interaction_features(df)
+#df = create_interaction_features(df)
 
 #aggregate features
 
@@ -109,7 +109,7 @@ def create_acoustic_instrumental_ratio(df):
     df['acoustic_instrumental_ratio'] = df['acousticness'] / (df['instrumentalness'] + 0.001)
     return df
 
-create_acoustic_instrumental_ratio(df)
+#create_acoustic_instrumental_ratio(df)
 
 #Categorical Binning of Continuous Variables
 
@@ -122,7 +122,7 @@ def create_categorical_features(df):
     
     return df
 
-create_categorical_features(df)
+#create_categorical_features(df)
 
 #polynomial features
 
@@ -164,7 +164,7 @@ def generate_polynomial_features(df):
 #print(df.dtypes)
 
 
-df = generate_polynomial_features(df)#total number of polynomial features generated is 21
+#df = generate_polynomial_features(df)#total number of polynomial features generated is 21
 
 #or if it is the second time with the same column name
 new_column_names = []
@@ -404,3 +404,40 @@ def perform_chi_square(feature):
 
 #model-based feature selection-random forest
 
+# Scatter plots for continuous features vs. music genre--via cptt
+def plot_scatterplots_test(df):
+    #for all numerical features
+    for col in df.select_dtypes(include=['float64']).columns:
+        plt.figure(figsize=(10, 6))
+        sns.scatterplot(x=df[col], y=df['music_genre'])
+        plt.title(f'Scatter plot of {col} vs. Music Genre')
+        plt.xlabel(col)
+        plt.ylabel('Music Genre')
+        plt.show()
+#plot_scatterplots_test(df)
+
+# Boxplots for visualizing outliers--via cptt
+def plot_boxplots_test(df):
+    for col in df.select_dtypes(include=['float64']).columns:
+        try:
+            plt.figure(figsize=(10, 4))
+            sns.boxplot(x=df[col])
+            plt.title(f'Boxplot of {col}')
+            plt.xlabel(col)
+            plt.show()
+        except Exception as e:
+            print(f"Error plotting {col}: {e}")
+
+#plot_boxplots_test(df)
+
+# Histograms for continuous features--via cptt
+def plot_histograms_test(df):
+    #for all numerical features
+    for col in df.select_dtypes(include=['float64']).columns: 
+        plt.figure(figsize=(10, 4))
+        sns.histplot(df[col], kde=True)#kde=True adds a kernel density estimate to the plot
+        plt.title(f'Distribution of {col}')
+        plt.xlabel(col)
+        plt.ylabel('Frequency')
+        plt.show()
+plot_histograms_test(df)

@@ -117,6 +117,7 @@ xgb_model = XGBClassifier(learning_rate=0.2, max_depth=3, n_estimators=200, subs
 svm_model = SVC(C=10, gamma='scale', kernel='rbf', probability=True, random_state=42)
 
 #only the neural network
+
 #Cross-validation accuracy: 59.02%
 #Test accuracy of Neural Network: 60.07%
 #difference between cross-validation and test accuracy is 0.0105
